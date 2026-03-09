@@ -1,0 +1,14 @@
+.game-card:hover .game-info {
+  transform: translateY(0);
+}
+.game-card:hover .game-cover {
+  filter: blur(4px) brightness(0.7);
+  transform: scale(1.05);
+}
+.game-info {
+  transform: translateY(100%);
+  transition: transform 0.3s ease-in-out;
+}
+.game-cover {
+  transition: all 0.3s ease-in-out;
+}
