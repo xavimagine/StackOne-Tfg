@@ -5,7 +5,6 @@ import LogDAO from "../dao/LogDAO.js";
 
 // --- Registro ---
 export const registro = async (req, res) => {
-  console.log("--- PROBANDO REGISTRO NUEVAMENTE ---");
   try {
     const { usuario, email, password } = req.body;
     const avatar = `https://api.dicebear.com/9.x/micah/svg?seed=${usuario}`;
@@ -38,7 +37,6 @@ export const registro = async (req, res) => {
       .select();
 
     if (error) {
-      console.error("Error de Supabase:", error.message);
       return res.status(400).json({ ok: false, mensaje: error.message });
     }
     await LogDAO.insertar(
@@ -46,10 +44,8 @@ export const registro = async (req, res) => {
       "REGISTRO",
       "Nuevo usuario creado con éxito",
     );
-    console.log("¡Usuario guardado con éxito!");
     return res.status(201).json({ ok: true, mensaje: "Cuenta creada" });
   } catch (error) {
-    console.error("Error en el servidor:", error);
     return res.status(500).json({ ok: false, mensaje: "Error interno" });
   }
 };
@@ -83,6 +79,7 @@ export const login = async (req, res) => {
 
 // --- Logout ---
 export const logout = (req, res) => {
+  const userId = req.session.usuario?.id;
   req.session.destroy(async (err) => {
     if (err) return res.status(500).json({ mensaje: "Error al cerrar sesión" });
     if (userId) {

@@ -61,11 +61,16 @@
           <div class="relative inline-block text-left" id="dropdown-container">
 
             <!-- VISTA LOGUEADO -->
+           <!-- VISTA LOGUEADO -->
             <div id="logged-in-view" class="hidden">
               <div class="flex items-center gap-3">
                 <span id="user-display-name" class="hidden md:block text-sm font-medium text-gray-700 dark:text-gray-300"></span>
-                <button class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
-                  <img id="user-avatar" alt="User Avatar" class="h-9 w-9 rounded-full object-cover border-2 border-primary" src=""/>
+                <img id="user-avatar" alt="User Avatar" class="h-9 w-9 rounded-full object-cover border-2 border-primary" src=""/>
+                <!-- BOTÓN LOGOUT -->
+                <button id="logout-btn" title="Cerrar sesión"
+                  class="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-500 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-lg border border-red-200 dark:border-red-800 transition">
+                  <span class="material-icons text-base">logout</span>
+                  <span class="hidden md:block">Cerrar Sesión</span>
                 </button>
               </div>
             </div>

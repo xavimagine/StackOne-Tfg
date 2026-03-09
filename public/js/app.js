@@ -115,8 +115,6 @@ formUsuario.addEventListener("submit", async (e) => {
   // AQUÍ DETECTAMOS EL MODO
   if (isRegister) {
     // --- Lógica de REGISTRO ---
-    console.log("Detectado: El usuario quiere CREAR una cuenta");
-
     if (data.password !== data.confirmPassword) {
       alert("Las contraseñas deben ser iguales");
       return;
@@ -125,8 +123,6 @@ formUsuario.addEventListener("submit", async (e) => {
     enviarPeticion("http://localhost:3000/registro", data);
   } else {
     // --- Lógica de LOGIN ---
-    console.log("Detectado: El usuario quiere ENTRAR");
-
     //Eliminar la confirmacion de la password del form porque no voy a necesitarla
     delete data.confirmPassword;
     delete data.email;
@@ -145,28 +141,25 @@ async function enviarPeticion(ruta, data) {
     });
 
     const resultado = await respuesta.json();
-    console.log(resultado);
     if (respuesta.ok && resultado.ok !== false) {
       // 1. Limpiamos los campos
       formUsuario.reset();
 
       if (isRegister) {
         alert("¡Cuenta creada correctamente! Ya puedes iniciar sesión.");
-        // Cambiamos la interfaz a modo "Login" automáticamente
+
         botonMenu.click();
       } else {
-        // --- LOGICA DE LOGIN EXITOSO ---
         alert("¡Bienvenido/a!");
 
-        // 2. OCULTAR EL MENÚ DESPLEGABLE (El cuadro blanco)
+        // OCULTAR EL MENÚ DESPLEGABLE
         desplegarMenu.classList.add("hidden");
 
-        // 3. INTERCAMBIAR VISTAS EN EL NAVBAR
+        //INTERCAMBIAR VISTAS EN EL NAVBAR
         document.getElementById("logged-out-view").classList.add("hidden");
         document.getElementById("logged-in-view").classList.remove("hidden");
 
-        // 4. PINTAR DATOS DESDE LA SESIÓN/DATABASE
-        // Asumiendo que tu backend devuelve: { user: { username: '...', avatar: '...' } }
+        // Avatar
         const nameSpan = document.getElementById("user-display-name");
         const avatarImg = document.getElementById("user-avatar");
 
@@ -178,8 +171,6 @@ async function enviarPeticion(ruta, data) {
     }
   } catch (error) {
     const usuarioAfectado = data.usuario || "Desconocido";
-
-    // Tu lógica de logs existente
     if (typeof registrarLog === "function") {
       await registrarLog(
         "ERROR",
@@ -187,11 +178,50 @@ async function enviarPeticion(ruta, data) {
       );
     }
 
-    console.error("Error detallado:", error);
     alert("No se ha podido conectar con el servidor. Inténtalo más tarde.");
   }
 }
+/**
+ *
+ * LOGOUT
+ *
+ */
 
+const logoutBtn = document.getElementById("logout-btn");
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      const respuesta = await fetch("http://localhost:3000/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      const resultado = await respuesta.json();
+
+      if (respuesta.ok && resultado.ok) {
+        // 1. Intercambiar vistas
+        document.getElementById("logged-in-view").classList.add("hidden");
+        document.getElementById("logged-out-view").classList.remove("hidden");
+
+        // 2. Limpiar datos de usuario
+        document.getElementById("user-display-name").textContent = "";
+        document.getElementById("user-avatar").src = "";
+      } else {
+        alert("No se pudo cerrar la sesión. Inténtalo de nuevo.");
+      }
+    } catch (error) {
+      const usuarioAfectado = data.usuario || "Desconocido";
+      if (typeof registrarLog === "function") {
+        await registrarLog(
+          "LOGIN_FALLIDO",
+          `Usuario [${usuarioAfectado}] falló en ${ruta}: ${error.message}`,
+        );
+      }
+      alert("No se pudo conectar con el servidor.");
+    }
+  });
+}
 async function registrarLog(tipo, mensaje) {
   try {
     await fetch("http://localhost:3000/logs", {
