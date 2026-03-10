@@ -1,23 +1,3 @@
-// CAMBIO DE LOGO NOMBRE SEGUN EL TEMA
-function updateLogos() {
-  const isDark = document.documentElement.classList.contains("dark");
-
-  const navIcon = document.getElementById("logo");
-  const navLogoText = document.getElementById("stackone");
-
-  if (navIcon) {
-    navIcon.src = isDark
-      ? "assets/logo/IconStackOneDark.svg"
-      : "assets/logo/IconStackOneLigth.svg";
-  }
-
-  if (navLogoText) {
-    navLogoText.src = isDark
-      ? "assets/theme/StackOneDark.svg"
-      : "assets/theme/StackOneLigth.svg";
-  }
-}
-
 /**
  * Despligue de menu movil
  */
@@ -232,4 +212,15 @@ async function registrarLog(tipo, mensaje) {
   } catch (err) {
     console.error("No se pudo conectar con el servicio de logs:", err);
   }
+}
+
+// Control del Menú Móvil
+const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+const mobileMenu = document.getElementById("mobile-menu");
+
+if (mobileMenuBtn && mobileMenu) {
+  mobileMenuBtn.addEventListener("click", () => {
+    // Alterna la clase 'hidden' para mostrar/ocultar
+    mobileMenu.classList.toggle("hidden");
+  });
 }

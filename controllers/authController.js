@@ -70,7 +70,11 @@ export const login = async (req, res) => {
       id: user.id,
       usuario: user.nick,
     };
-    await LogDAO.insertar(user.id, "LOGIN", "Inicio de sesión correcto");
+    await LogDAO.insertar(
+      user.id,
+      "LOGIN",
+      `Inicio de sesión correcto - ID: ${user.id}`,
+    );
     res.json({ ok: true, avatar: user.avatar });
   } catch (error) {
     res.status(500).json({ error: "Error en login" });
@@ -83,7 +87,11 @@ export const logout = (req, res) => {
   req.session.destroy(async (err) => {
     if (err) return res.status(500).json({ mensaje: "Error al cerrar sesión" });
     if (userId) {
-      await LogDAO.insertar(userId, "LOGOUT", "Sesión cerrada por el usuario");
+      await LogDAO.insertar(
+        userId,
+        "LOGOUT",
+        `Cierre de sesión correcto - ID: ${user.id}`,
+      );
     }
     res.json({ ok: true, mensaje: "Logout correcto" });
   });
