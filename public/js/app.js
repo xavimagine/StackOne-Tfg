@@ -1,7 +1,6 @@
 /**
  * Despligue de menu movil
  */
-// Esperamos a que cargue el DOM
 async function fetchUserData() {
   // 1. Obtenemos el usuario autenticado
   const {
@@ -18,22 +17,10 @@ async function fetchUserData() {
       .single();
 
     if (profile) {
-      // 3. Ocultar vistas de login
+      //Ocultar vistas de login
       document.getElementById("logged-out-view").classList.add("hidden");
       document.getElementById("dropdown-menu").classList.add("hidden");
       document.getElementById("logged-in-view").classList.remove("hidden");
-
-      // 4. Actualizar Nombre
-      document.getElementById("user-display-name").textContent =
-        profile.username;
-
-      // 5. Construir la URL del Avatar
-      // 'avatars' es el nombre de tu Bucket en Supabase Storage
-      const { data: publicUrlData } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(profile.avatar);
-
-      document.getElementById("user-avatar").src = publicUrlData.publicUrl;
     }
   }
 }
@@ -124,7 +111,8 @@ async function enviarPeticion(ruta, data) {
     if (respuesta.ok && resultado.ok !== false) {
       // 1. Limpiamos los campos
       formUsuario.reset();
-
+      seccionPerfil.classList.add("hidden");
+      seccionBuscador.classList.remove("hidden");
       if (isRegister) {
         alert("¡Cuenta creada correctamente! Ya puedes iniciar sesión.");
 
@@ -142,19 +130,25 @@ async function enviarPeticion(ruta, data) {
         // Avatar
         const nameSpan = document.getElementById("user-display-name");
         const avatarImg = document.getElementById("user-avatar");
+        const avatarProfile = document.getElementById("avatarProfile");
+        const userName = document.getElementById("Nombreuser");
+        const bienvenida = document.getElementById("bienvenida");
 
         nameSpan.textContent = resultado.username || "";
         avatarImg.src = resultado.avatar || "assets/default-avatar.png";
+        avatarProfile.src = resultado.avatar || "assets/default-avatar.png";
+        userName.textContent = resultado.nick;
+        bienvenida.textContent = `¡ Bienvenido ${resultado.nick} !`;
       }
     } else {
       alert("Atención: " + (resultado.mensaje || "Error en el servidor"));
     }
   } catch (error) {
-    const usuarioAfectado = data.usuario || "Desconocido";
+    const usuarioAfectado = data.id || "Desconocido";
     if (typeof registrarLog === "function") {
       await registrarLog(
         "ERROR",
-        `Usuario [${usuarioAfectado}] falló en ${ruta}: ${error.message}`,
+        `Usuario [${usuarioAfectado}] falló: ${error.message}`,
       );
     }
 
@@ -187,16 +181,13 @@ if (logoutBtn) {
         // 2. Limpiar datos de usuario
         document.getElementById("user-display-name").textContent = "";
         document.getElementById("user-avatar").src = "";
+        document.getElementById("avatarProfile").src = "";
       } else {
         alert("No se pudo cerrar la sesión. Inténtalo de nuevo.");
       }
     } catch (error) {
-      const usuarioAfectado = data.usuario || "Desconocido";
       if (typeof registrarLog === "function") {
-        await registrarLog(
-          "LOGIN_FALLIDO",
-          `Usuario [${usuarioAfectado}] falló en ${ruta}: ${error.message}`,
-        );
+        await registrarLog("LOGIN_FALLIDO", `LOGIN_FALLIDO: ${error.message}`);
       }
       alert("No se pudo conectar con el servidor.");
     }
@@ -209,9 +200,7 @@ async function registrarLog(tipo, mensaje) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ tipo, mensaje }),
     });
-  } catch (err) {
-    console.error("No se pudo conectar con el servicio de logs:", err);
-  }
+  } catch (err) {}
 }
 
 // Control del Menú Móvil
@@ -224,3 +213,41 @@ if (mobileMenuBtn && mobileMenu) {
     mobileMenu.classList.toggle("hidden");
   });
 }
+
+/**
+ * PERFIL OCULTADO Y MOSTRADO
+ */
+// Referencias a los botones del Nav
+const linkDescubrir = document.getElementById("nav-descubrir");
+const linkPerfil = document.getElementById("nav-perfil");
+const linkPerfilMobile = document.getElementById("nav-perfil-mobile");
+// Referencias a las secciones
+const seccionBuscador = document.getElementById("buscador");
+const seccionPerfil = document.getElementById("perfil");
+
+// --- FUNCIÓN PARA MOSTRAR DESCUBRIR ---
+linkDescubrir.addEventListener("click", (e) => {
+  e.preventDefault();
+  seccionBuscador.classList.remove("hidden");
+  seccionPerfil.classList.add("hidden");
+});
+linkPerfilMobile.addEventListener("click", (e) => {
+  e.preventDefault();
+  seccionBuscador.classList.remove("hidden");
+  seccionPerfil.classList.add("hidden");
+});
+
+// --- FUNCIÓN PARA MOSTRAR PERFIL (CON FILTRO DE SESIÓN) ---
+linkPerfil.addEventListener("click", (e) => {
+  e.preventDefault();
+  const isLoggedIn = !document
+    .getElementById("logged-in-view")
+    .classList.contains("hidden");
+
+  if (isLoggedIn) {
+    seccionBuscador.classList.add("hidden");
+    seccionPerfil.classList.remove("hidden");
+  } else {
+    desplegarMenu.classList.remove("hidden");
+  }
+});

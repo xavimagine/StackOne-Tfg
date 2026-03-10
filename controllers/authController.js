@@ -75,7 +75,7 @@ export const login = async (req, res) => {
       "LOGIN",
       `Inicio de sesión correcto - ID: ${user.id}`,
     );
-    res.json({ ok: true, avatar: user.avatar });
+    res.json({ ok: true, avatar: user.avatar, nick: user.nick, id: user.id });
   } catch (error) {
     res.status(500).json({ error: "Error en login" });
   }

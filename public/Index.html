@@ -13,6 +13,12 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet" />
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+          <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Round"
+      rel="stylesheet" />
     <script defer src="js/tailwing.js"></script>
     <script defer  src="js/app.js"></script>
     <link rel="stylesheet" href="css/style.css" />
@@ -40,11 +46,11 @@
 
         <!-- LINKS NAVEGACIÓN -->
         <div class="hidden lg:flex items-center flex-1 justify-center gap-8">
-          <a class="px-4 py-2 text-primary bg-primary/10 rounded-full font-medium transition hover:bg-primary/20" href="#">Home</a>
-          <a class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium flex items-center gap-1" href="#">
+          <a class="px-4 py-2 text-primary bg-primary/10 rounded-full font-medium transition hover:bg-primary/20" id="nav-descubrir">Descubrir</a>
+          <a class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium flex items-center gap-1" id="nav-perfil">
             Perfil 
           </a>
-          <a class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium" href="#">Events</a>
+          <a class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium" href="#">Eventos</a>
           <a class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium" href="#">Recommendations</a>
         </div>
 
@@ -123,9 +129,9 @@
     
     <div id="mobile-menu" class="hidden lg:hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4">
       <div class="flex flex-col gap-4">
-        <a class="px-4 py-2 text-primary bg-primary/10 rounded-full font-medium w-fit" href="#">Home</a>
-        <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" href="#">Perfil</a>
-        <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" href="#">Events</a>
+        <a class="px-4 py-2 text-primary bg-primary/10 rounded-full font-medium w-fit" id="nav-descubrir">Descubrir</a>
+        <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" id="nav-perfil-mobile">Perfil</a>
+        <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" href="#">Eventos</a>
         <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" href="#">Recommendations</a>
       </div>
     </div>
@@ -167,6 +173,8 @@
         </div>
       </div>
     </header>
+    <!-- Buscador -->
+     <div id="buscador">
     <section class="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
       <div
         class="bg-card-light dark:bg-card-dark rounded-xl shadow-xl border border-gray-100 dark:border-gray-800 p-6">
@@ -243,8 +251,7 @@
               </select>
               <span
                 class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"
-                >expand_more</span
-              >
+                >expand_more</span>
             </div>
             <div class="relative">
               <select
@@ -310,7 +317,7 @@
         </div>
         
         </div>
-      </div>
+      </di>
       <!-- Paginación -->
       <div class="flex justify-center mt-12 gap-2">
         <button
@@ -337,6 +344,121 @@
           <span class="material-icons text-sm">chevron_right</span>
         </button>
       </div>
+    </div>
+    <section id="perfil" class="hidden">
+          <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="relative rounded-2xl overflow-hidden mb-8 h-64 md:h-80 shadow-xl group">
+        
+        <div class="absolute inset-0 bg-[#8B5E5E] dark:bg-[#5a3a3a] transition-colors duration-500"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent z-10"></div>
+
+        <div class="absolute inset-0 flex items-center justify-center md:justify-end pr-0 md:pr-20 opacity-30 md:opacity-100 transition-opacity">
+          <img
+            alt="Gaming Controller"
+            class="h-full w-full md:w-auto object-cover md:rounded-l-3xl shadow-2xl transform translate-x-10 md:translate-x-0"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuA89YJYkIV3tBjHo8GDEpIGmM4kE2dz5slTgTdXwPgf8tQtRlove-nFTeRDLSHn_1dlitMCjaByMW27OlfO4jhlxXQwOIa2EjG3GJcgf-A0aPejpytAQrLlTjKTDCq6V-afrp3OXaNiorpfcvcmHKFRITkoikGTlaXYaLyO8CPYDbkn2Fcs3oK85nz9wx0XyT0CFe2EcQROl8Maaa1x0AapzmlxcSCONkgz7T5Qm86jLmbtvuJIDEUxRTrrKgzCA6SNfYJ3MrsRryk" />
+        </div>
+
+        <div class="absolute inset-0 z-20 flex flex-col justify-center px-8 md:px-12">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary text-white w-fit mb-4">
+            New Season
+          </span>
+
+          <h1 class="text-3xl md:text-5xl font-bold text-white mb-2 tracking-tight" id="bienvenida">
+          </h1>
+
+          <div class="mt-6 flex gap-3">
+            <button class="bg-white text-gray-900 hover:bg-gray-100 px-6 py-2.5 rounded-lg font-semibold shadow-lg transition-all transform hover:scale-105 flex items-center gap-2">
+              <span class="material-icons-round text-primary">play_arrow</span>
+              Resume
+            </button>
+
+            <button class="bg-black/30 backdrop-blur-md text-white hover:bg-black/40 px-6 py-2.5 rounded-lg font-medium transition-all border border-white/20">
+              View Stats
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CUADRADOS ALINEADOS -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- PERFIL -->
+        <div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          
+          <div class="flex flex-col items-center text-center">
+            
+            <div class="relative">
+              <img
+                alt="Profile"
+                class="h-24 w-24 rounded-full object-cover border-4 border-background-light dark:border-background-dark shadow-md"
+                src="" id="avatarProfile"
+              />
+
+              <div class="absolute bottom-0 right-0 h-6 w-6 bg-green-500 border-4 border-surface-light dark:border-surface-dark rounded-full"></div>
+            </div>
+
+            <h2 class="mt-4 text-xl font-bold text-gray-900 dark:text-white" id="Nombreuser">
+            </h2>
+
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Level 42 Explorer
+            </p>
+
+            <div class="w-full mt-4">
+              <div class="flex justify-between text-xs mb-1 text-gray-500 font-medium">
+                <span>XP</span>
+                <span>2,450 / 3,000</span>
+              </div>
+
+              <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div class="bg-primary h-2 rounded-full" style="width: 82%"></div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- MENU -->
+        <div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          
+          <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="font-semibold text-gray-900 dark:text-white">
+              Listas
+            </h3>
+          </div>
+
+          <nav class="flex flex-col p-2">
+
+            <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" href="#">
+              <span class="material-icons-round text-primary">bookmark</span>
+              Jugando
+            </a>
+
+            <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" href="#">
+              <span class="material-icons-round text-pink-500">favorite</span>
+              Deseados
+            </a>
+
+            <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" href="#">
+              <span class="material-icons-round text-yellow-500">emoji_events</span>
+              Acabados
+            </a>
+
+            <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" href="#">
+              <span class="material-icons-round text-red-500">close</span>
+              Abandonados
+            </a>
+          </nav>
+
+          </div>
+
+        </div>
+
+      </main>
+    </section>
     </main>
     <footer
       class="bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-800 mt-12 py-8">
