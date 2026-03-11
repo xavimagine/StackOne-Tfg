@@ -85,7 +85,7 @@ formUsuario.addEventListener("submit", async (e) => {
     if (data.password !== data.confirmPassword) {
       Swal.fire({
         title: "¡Error!",
-        text: "Las contraseñas deben ser iguales",
+        text: "Las contraseñas deber iguales",
         icon: "error",
         confirmButtonText: "Intentar de nuevo",
         confirmButtonColor: "#d33",
@@ -123,7 +123,7 @@ async function enviarPeticion(ruta, data) {
       if (isRegister) {
         Swal.fire({
           title: "¡Cuenta creada!",
-          text: "Ya puedes iniciar sesión con tus datos.",
+          text: "Ya puedes iniciar sesión",
           icon: "success",
           confirmButtonText: "Ir al Login",
           confirmButtonColor: "#2ecc71",
@@ -140,8 +140,8 @@ async function enviarPeticion(ruta, data) {
         Swal.fire({
           title: '<span style="color:#2ecc71">¡Excelente!</span>',
           text: "Te has registrado con éxito",
-          background: "#fff", // Fondo oscuro
-          color: "#fff", // Texto blanco
+          background: "#fff",
+          color: "#fff",
           confirmButtonColor: "#2ecc71",
           icon: "success",
           width: "300px",

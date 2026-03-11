@@ -1,0 +1,11 @@
+[build]
+  # Directorio donde está tu index.html
+  publish = "public"
+
+  # Si en el futuro usas un comando de build (como npm run build)
+  # command = "npm run build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
