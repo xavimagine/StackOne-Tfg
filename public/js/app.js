@@ -83,7 +83,14 @@ formUsuario.addEventListener("submit", async (e) => {
   if (isRegister) {
     // --- Lógica de REGISTRO ---
     if (data.password !== data.confirmPassword) {
-      alert("Las contraseñas deben ser iguales");
+      Swal.fire({
+        title: "¡Error!",
+        text: "Las contraseñas deben ser iguales",
+        icon: "error",
+        confirmButtonText: "Intentar de nuevo",
+        confirmButtonColor: "#d33",
+        width: "350px",
+      });
       return;
     }
 
@@ -114,11 +121,32 @@ async function enviarPeticion(ruta, data) {
       seccionPerfil.classList.add("hidden");
       seccionBuscador.classList.remove("hidden");
       if (isRegister) {
-        alert("¡Cuenta creada correctamente! Ya puedes iniciar sesión.");
+        Swal.fire({
+          title: "¡Cuenta creada!",
+          text: "Ya puedes iniciar sesión con tus datos.",
+          icon: "success",
+          confirmButtonText: "Ir al Login",
+          confirmButtonColor: "#2ecc71",
+          width: "350px",
+          allowOutsideClick: false,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = "index.html";
+          }
+        });
 
         botonMenu.click();
       } else {
-        alert("¡Bienvenido/a!");
+        Swal.fire({
+          title: '<span style="color:#2ecc71">¡Excelente!</span>',
+          text: "Te has registrado con éxito",
+          background: "#fff", // Fondo oscuro
+          color: "#fff", // Texto blanco
+          confirmButtonColor: "#2ecc71",
+          icon: "success",
+          width: "300px",
+          iconColor: "#2ecc71",
+        });
 
         // OCULTAR EL MENÚ DESPLEGABLE
         desplegarMenu.classList.add("hidden");
@@ -140,8 +168,6 @@ async function enviarPeticion(ruta, data) {
         userName.textContent = resultado.nick;
         bienvenida.textContent = `¡ Bienvenido ${resultado.nick} !`;
       }
-    } else {
-      alert("Atención: " + (resultado.mensaje || "Error en el servidor"));
     }
   } catch (error) {
     const usuarioAfectado = data.id || "Desconocido";
@@ -151,8 +177,6 @@ async function enviarPeticion(ruta, data) {
         `Usuario [${usuarioAfectado}] falló: ${error.message}`,
       );
     }
-
-    alert("No se ha podido conectar con el servidor. Inténtalo más tarde.");
   }
 }
 /**
@@ -182,14 +206,11 @@ if (logoutBtn) {
         document.getElementById("user-display-name").textContent = "";
         document.getElementById("user-avatar").src = "";
         document.getElementById("avatarProfile").src = "";
-      } else {
-        alert("No se pudo cerrar la sesión. Inténtalo de nuevo.");
       }
     } catch (error) {
       if (typeof registrarLog === "function") {
         await registrarLog("LOGIN_FALLIDO", `LOGIN_FALLIDO: ${error.message}`);
       }
-      alert("No se pudo conectar con el servidor.");
     }
   });
 }
@@ -251,3 +272,126 @@ linkPerfil.addEventListener("click", (e) => {
     desplegarMenu.classList.remove("hidden");
   }
 });
+
+/**
+ * PINTAR LAS CARDS
+ */
+
+function createGameCard({
+  name,
+  genres,
+  rating,
+  company,
+  coverImage,
+  coverAlt,
+  game_mode,
+}) {
+  const card = document.createElement("div");
+  card.className =
+    "game-card relative group rounded-xl overflow-hidden shadow-lg h-96 cursor-pointer bg-gray-900";
+
+  card.innerHTML = `
+    <img
+      alt="${coverAlt || name}"
+      class="game-cover w-full h-full object-cover"
+      src="${coverImage}" />
+
+    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60"></div>
+
+    <div class="absolute top-3 right-3 bg-black/60 backdrop-blur text-white text-xs font-bold px-2 py-1 rounded border border-white/20">
+      ${rating}
+    </div>
+
+    <div class="game-info absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-primary/90 to-primary/80 backdrop-blur-md border-t border-white/10 text-white">
+      <h3 class="text-xl font-bold mb-1">${title}</h3>
+      <div class="flex items-center gap-3 text-sm text-white/80 mb-3">
+        <span class="flex items-center gap-1">
+          <span class="material-icons text-xs">star</span> ${rating}
+        </span>
+        <span>•</span>
+        <span>${genres}</span>
+      </div>
+      <p class="text-xs text-white/70 mb-3 line-clamp-2">${game_mode}</p>
+      <div class="text-xs font-medium text-white/90">Released: ${company}</div>
+
+      <section id="card-option" class="flex flex-row items-center gap-2">
+        <a class="flex items-center gap-3 px-4 py-3 bookmark-btn cursor-pointer">
+          <span class="material-icons-round text-fuchsia-400">bookmark</span>
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 favorite-btn cursor-pointer">
+          <span class="material-icons-round text-pink-500">favorite</span>
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 award-btn cursor-pointer">
+          <span class="material-icons-round text-yellow-500">emoji_events</span>
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 close-btn cursor-pointer">
+          <span class="material-icons-round text-red-500">close</span>
+        </a>
+      </section>
+    </div>
+  `;
+  return card;
+}
+
+const ITEMS_PER_PAGE = 10;
+let currentPage = 0;
+
+async function fetchGames(page = 0) {
+  const from = page * ITEMS_PER_PAGE;
+  const to = from + ITEMS_PER_PAGE - 1;
+
+  const { data, error, count } = await supabase
+    .from("games")
+    .select("name,cover,genres,rating,game_modes,company", { count: "exact" })
+    .range(from, to);
+
+  if (error) {
+    console.error("Error fetching games:", error);
+    return;
+  }
+
+  renderCards(data);
+  renderPagination(page, count);
+}
+
+function renderCards(games) {
+  const container = document.getElementById("games-container");
+  container.innerHTML = "";
+
+  games.forEach((game) => {
+    const card = createGameCard({ ...game });
+    container.appendChild(card);
+  });
+}
+
+function renderPagination(currentPage, totalCount) {
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+  const pagination = document.getElementById("pagination");
+  pagination.innerHTML = "";
+
+  // Botón anterior
+  const prevBtn = document.createElement("button");
+  prevBtn.textContent = "← Anterior";
+  prevBtn.disabled = currentPage === 0;
+  prevBtn.onclick = () => fetchGames(currentPage - 1);
+  pagination.appendChild(prevBtn);
+
+  // Números de página
+  for (let i = 0; i < totalPages; i++) {
+    const pageBtn = document.createElement("button");
+    pageBtn.textContent = i + 1;
+    pageBtn.className = i === currentPage ? "active" : "";
+    pageBtn.onclick = () => fetchGames(i);
+    pagination.appendChild(pageBtn);
+  }
+
+  // Botón siguiente
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent = "Siguiente →";
+  nextBtn.disabled = currentPage >= totalPages - 1;
+  nextBtn.onclick = () => fetchGames(currentPage + 1);
+  pagination.appendChild(nextBtn);
+}
+
+// Llamada inicial
+fetchGames(0);

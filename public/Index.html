@@ -6,6 +6,7 @@
     <link rel="icon" type="image/svg+xml" href="assets/logo/IconStackOneLigth.svg">
     <title>StackOne</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
       rel="stylesheet" />
@@ -183,20 +184,29 @@
             class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-4 mb-2">
             <h2 class="text-lg font-semibold flex items-center gap-2">
               <span class="material-icons text-primary">filter_list</span>
-              Filters
+              Busqueda
             </h2>
             <button class="text-sm text-primary font-medium hover:underline">
-              Reset All
+              Resetear todo
             </button>
           </div>
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="relative group">
               <select
                 class="w-full appearance-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer">
-                <option>Genre</option>
-                <option>Action</option>
-                <option>RPG</option>
-                <option>Strategy</option>
+                <option>Genero</option>
+                <option value="Adventure">Aventuras</option>
+                <option value="Arcade">Arcade</option>
+                <option value="Fighting">Pelea</option>
+                <option value="Indie">Indie</option>
+                <option value="MOBA">MOBA</option>
+                <option value="Platform">Plataformas</option>
+                <option value="Puzzle">Puzzle</option>
+                <option value="Racing">Carreras</option>
+                <option value="Shooter">Shooter</option>
+                <option value="Sport">Deportes</option>
+                <option value="Strategy">Estrategia</option>
+                <option value="Tactical">Tactico</option>
               </select>
               <span
                 class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"
@@ -210,19 +220,12 @@
                 <option>PC</option>
                 <option>PlayStation</option>
                 <option>Xbox</option>
-              </select>
-              <span
-                class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"
-                >expand_more</span
-              >
-            </div>
-            <div class="relative">
-              <select
-                class="w-full appearance-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer">
-                <option>Year</option>
-                <option>2023</option>
-                <option>2022</option>
-                <option>Older</option>
+                <option value="Nintendo">Nintendo</option>
+                <option value="Android">Android</option>
+                <option value="Atari">Atari</option>
+                <option value="Game Boy">Game Boy</option>
+                <option value="Mac">Mac</option>
+                <option value="Wii">Wii</option>
               </select>
               <span
                 class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"
@@ -233,47 +236,17 @@
               <select
                 class="w-full appearance-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer">
                 <option>Rating</option>
-                <option>90+</option>
-                <option>80+</option>
-                <option>70+</option>
+                <option value="90">+90</option>
+                <option value="80">+80</option>
+                <option value="70">+70</option>
+                <option value="60">+60</option>
+                <option value="50">+50</option>
               </select>
               <span
                 class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"
                 >expand_more</span
               >
             </div>
-            <div class="relative">
-              <select
-                class="w-full appearance-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer">
-                <option>Developer</option>
-                <option>Indie</option>
-                <option>AAA</option>
-              </select>
-              <span
-                class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"
-                >expand_more</span>
-            </div>
-            <div class="relative">
-              <select
-                class="w-full appearance-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer">
-                <option>Mode</option>
-                <option>Single Player</option>
-                <option>Multiplayer</option>
-                <option>Co-op</option>
-              </select>
-              <span
-                class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"
-                >expand_more</span
-              >
-            </div>
-          </div>
-          <div
-            class="flex justify-end mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-            <button
-              class="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition">
-              Sort by Date
-              <span class="material-icons text-sm">arrow_downward</span>
-            </button>
           </div>
         </div>
       </div>
@@ -284,7 +257,7 @@
       <div
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
 
-        <!-- card -->
+        <!-- card
         <div
           class="game-card relative group rounded-xl overflow-hidden shadow-lg h-96 cursor-pointer bg-gray-900">
           <img
@@ -313,11 +286,24 @@
             <div class="text-xs font-medium text-white/90">
               Released: Oct 2023
             </div>
+           <section id="card-option" class="flex flex-row items-center gap-2">
+            <a class="flex items-center gap-3 px-4 py-3" >
+              <span class="material-icons-round text-fuchsia-400">bookmark</span>
+            </a>
+             <a class="flex items-center gap-3 px-4 py-3" >
+              <span class="material-icons-round text-pink-500">favorite</span>
+             </a>
+             <a class="flex items-center gap-3 px-4 py-3" > 
+              <span class="material-icons-round text-yellow-500">emoji_events</span>
+            </a> 
+            <a class="flex items-center gap-3 px-4 py-3" >
+              <span class="material-icons-round text-red-500">close</span>
+           </a>
+          </section>
           </div>
+        </div> -->
         </div>
-        
-        </div>
-      </di>
+      </div>
       <!-- Paginación -->
       <div class="flex justify-center mt-12 gap-2">
         <button
@@ -360,10 +346,6 @@
         </div>
 
         <div class="absolute inset-0 z-20 flex flex-col justify-center px-8 md:px-12">
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary text-white w-fit mb-4">
-            New Season
-          </span>
-
           <h1 class="text-3xl md:text-5xl font-bold text-white mb-2 tracking-tight" id="bienvenida">
           </h1>
 
@@ -433,7 +415,7 @@
           <nav class="flex flex-col p-2">
 
             <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" href="#">
-              <span class="material-icons-round text-primary">bookmark</span>
+              <span class="material-icons-round text-fuchsia-400">bookmark</span>
               Jugando
             </a>
 
