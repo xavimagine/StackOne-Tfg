@@ -1,10 +1,10 @@
 /**
  * PARA USAR SUPA BASE EN NETLIFY
  */
-const { createClient } = supabase;
+const { createClient } = db;
 
-const supabase = createClient(
-  "https://dpdqoaymzrdoqecfoyylf.supabase.co",
+const db = createClient(
+  "https://dpdqoaymzrdoqecfoyylf.db.co",
   "sb_publishable_zGP2SnNGNYPQY-5DDbju8g_KFf_R7ly",
 );
 
@@ -16,11 +16,11 @@ async function fetchUserData() {
   const {
     data: { user },
     error: authError,
-  } = await supabase.auth.getUser();
+  } = await db.auth.getUser();
 
   if (user) {
     // 2. Consultamos la tabla 'users' usando el ID del usuario
-    const { data: profile, error: dbError } = await supabase
+    const { data: profile, error: dbError } = await db
       .from("users")
       .select("avatar, username") // username o el campo que uses para el nombre
       .eq("id", user.id)
@@ -350,7 +350,7 @@ async function fetchGames(page = 0) {
   const from = page * ITEMS_PER_PAGE;
   const to = from + ITEMS_PER_PAGE - 1;
 
-  const { data, error, count } = await supabase
+  const { data, error, count } = await db
     .from("games")
     .select("name,cover,genres,rating,game_modes,company", { count: "exact" })
     .range(from, to);
