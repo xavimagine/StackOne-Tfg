@@ -1,10 +1,9 @@
 /**
  * PARA USAR SUPA BASE EN NETLIFY
  */
-const { createClient } = db;
-
+const { createClient } = supabase;
 const db = createClient(
-  "https://dpdqoaymzrdoqecfoyylf.db.co",
+  "https://dpdqoaymzrdoqecfoyylf.supabase.co",
   "sb_publishable_zGP2SnNGNYPQY-5DDbju8g_KFf_R7ly",
 );
 
