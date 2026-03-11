@@ -3,7 +3,7 @@
  */
 const { createClient } = supabase;
 
-const db = createClient(
+const supabase = createClient(
   "https://dpdqoaymzrdoqecfoyylf.supabase.co",
   "sb_publishable_zGP2SnNGNYPQY-5DDbju8g_KFf_R7ly",
 );
