@@ -1,4 +1,14 @@
 /**
+ * PARA USAR SUPA BASE EN NETLIFY
+ */
+const { createClient } = supabase;
+
+const db = createClient(
+  "https://dpdqoaymzrdoqecfoyylf.supabase.co",
+  "sb_publishable_zGP2SnNGNYPQY-5DDbju8g_KFf_R7ly",
+);
+
+/**
  * Despligue de menu movil
  */
 async function fetchUserData() {
