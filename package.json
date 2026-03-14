@@ -1,25 +1,29 @@
 {
-  "name": "stackone",
-  "version": "1.0.0",
-  "description": "Esto es una app web tracker de videojuegos. La cual tiene un registro y se puede usar sin estar registrado al menos para buscar información de juegos. Te permite tener tus listas de juegos los cuales hayas finalizado,quieras jugar,tengas comprados,hayas abandonado y cuales estas juguando actualmente",
-  "main": "public/app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "supabase",
-    "database-migration"
-  ],
-  "author": "Javier Díaz Rayo",
-  "license": "MIT",
-  "dependencies": {
-    "@supabase/supabase-js": "^2.98.0",
-    "bcrypt": "^6.0.0",
-    "cors": "^2.8.6",
-    "dotenv": "^17.3.1",
-    "express": "^5.2.1",
-    "express-session": "^1.19.0",
-    "mysql2": "^3.18.2",
-    "pg": "^8.19.0"
-  }
+    "name": "stackone",
+    "version": "1.0.0",
+    "description": "Esto es una app web tracker de videojuegos. La cual tiene un registro y se puede usar sin estar registrado al menos para buscar información de juegos. Te permite tener tus listas de juegos los cuales hayas finalizado,quieras jugar,tengas comprados,hayas abandonado y cuales estas juguando actualmente",
+    "main": "public/app.js",
+    "scripts": {
+        "test": "jest"
+    },
+    "keywords": [
+        "supabase",
+        "database-migration"
+    ],
+    "author": "Javier Díaz Rayo",
+    "license": "MIT",
+    "dependencies": {
+        "@supabase/supabase-js": "^2.98.0",
+        "bcrypt": "^6.0.0",
+        "cors": "^2.8.6",
+        "dotenv": "^17.3.1",
+        "express": "^5.2.1",
+        "express-session": "^1.19.0",
+        "jest": "^30.3.0",
+        "mysql2": "^3.18.2",
+        "pg": "^8.19.0"
+    },
+    "devDependencies": {
+        "supertest": "^7.2.2"
+    }
 }
