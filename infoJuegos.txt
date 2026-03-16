@@ -67,3 +67,13 @@ CREATE POLICY "Permitir inserción de logs al servidor"
 ON public.logs 
 FOR INSERT 
 WITH CHECK (true);
+
+
+-- Índice en user_id: para "dame todos los juegos de este usuario"
+CREATE INDEX idx_listas_user_id ON listas_games(user_id);
+
+-- Índice en game_id: para "qué usuarios tienen este juego"
+CREATE INDEX idx_listas_game_id ON listas_games(game_id);
+
+-- Índice compuesto user_id + status: para "juegos 'completados' de este usuario"
+CREATE INDEX idx_listas_user_status ON listas_games(user_id, status);
