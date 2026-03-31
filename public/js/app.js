@@ -490,7 +490,6 @@ function renderPagination({ currentPage, totalPages }) {
     pagination.appendChild(nextBtn);
 }
 
-// 6. Por último fetchGames y la llamada inicial
 async function fetchGames(page = 1) {
     try {
         const respuesta = await fetch(
