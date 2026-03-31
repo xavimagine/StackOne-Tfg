@@ -189,6 +189,7 @@ async function enviarPeticion(ruta, data) {
                     resultado.avatar || "assets/default-avatar.png";
                 userName.textContent = resultado.nick;
                 bienvenida.textContent = `¡ Bienvenido ${resultado.nick} !`;
+                fetchGames(currentPage);
             }
         }
     } catch (error) {
@@ -235,6 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         .getElementById("logged-out-view")
                         .classList.remove("hidden");
                     limpiarSesion();
+                    fetchGames(currentPage);
                 }
             } catch (error) {
                 // Si el backend falla, limpia el frontend igualmente
