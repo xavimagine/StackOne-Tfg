@@ -45,7 +45,6 @@ class GameController {
                 plataforma,
                 rating,
             );
-
             res.json({
                 games,
                 pagination: {

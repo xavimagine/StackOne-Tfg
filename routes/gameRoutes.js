@@ -3,7 +3,7 @@ const router = express.Router();
 const gameController = require("../controllers/gameController");
 
 // Todas las rutas protegidas
-router.post("/buscar", gameController.buscarConPaginacion);
-router.post("/listar", gameController.listar);
+router.get("/buscar", gameController.buscarConPaginacion);
+router.get("/listar", gameController.listar);
 
 module.exports = router;

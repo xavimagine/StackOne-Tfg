@@ -6,7 +6,7 @@ node_modules/
 
 # Carpetas innecesarias
 update_bd/
-
+x.html
 # Archivos innecesarios
 depen.txt
 infoJuegos.txt

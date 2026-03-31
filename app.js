@@ -37,7 +37,7 @@ const authRoutes = require("./routes/authRoutes");
 // logs
 const logsRoutes = require("./routes/logsRoutes");
 
-app.use("/game", gameRoutes);
+app.use("/games", gameRoutes);
 app.use("/", authRoutes);
 app.use("/logs", logsRoutes);
 
