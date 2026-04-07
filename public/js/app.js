@@ -593,10 +593,10 @@ function renderEventCards(events) {
     events.forEach((event) => {
         const date = new Date(event.start_time * 1000).toLocaleDateString();
 
-        const imgUrl = event.event_logo
-            ? `https:${event.event_logo.url.replace("t_thumb", "t_cover_big")}`
-            : "https://via.placeholder.com/400x200?text=No+Image";
-        console.log(imgUrl);
+        const imgUrl =
+            event.event_logo && event.event_logo.url
+                ? `https:${event.event_logo.url.replace("t_thumb", "t_cover_big")}`
+                : "assets/default/default-event-image.png"; //
         container.innerHTML += `
             <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 transition-transform hover:scale-[1.02]">
                 <img src="${imgUrl}" class="w-full h-48 object-cover" alt="${event.name}">

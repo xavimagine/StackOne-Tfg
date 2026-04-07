@@ -50,7 +50,6 @@ app.post("/events", async (req, res) => {
         );
 
         const authData = await authResponse.json();
-        console.log("Auth completa:", authData);
         if (!authData.access_token) {
             return res.status(401).json({
                 error: "No se obtuvo access_token",
@@ -74,7 +73,6 @@ app.post("/events", async (req, res) => {
         });
 
         const events = await response.json();
-        console.log("IGDB:", events);
 
         if (!Array.isArray(events)) {
             return res.status(500).json({
