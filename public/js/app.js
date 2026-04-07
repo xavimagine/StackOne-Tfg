@@ -132,11 +132,20 @@ async function enviarPeticion(ruta, data) {
         });
 
         const resultado = await respuesta.json();
-        if (respuesta.ok && resultado.ok !== false) {
+        if (!respuesta.ok) {
+            return Swal.fire({
+                icon: "error",
+                title: "Validación fallida",
+                text: resultado.mensaje,
+                confirmButtonColor: "#8B5E5E",
+            });
+        }
+        if (respuesta.ok) {
             // 1. Limpiamos los campos
             formUsuario.reset();
             seccionPerfil.classList.add("hidden");
             seccionBuscador.classList.remove("hidden");
+
             if (isRegister) {
                 Swal.fire({
                     title: "¡Cuenta creada!",
@@ -193,7 +202,6 @@ async function enviarPeticion(ruta, data) {
             }
         }
     } catch (error) {
-        console.log(data);
         const usuarioAfectado = data.usuario || data.email || "Desconocido";
         if (typeof registrarLog === "function") {
             await registrarLog(
@@ -349,6 +357,7 @@ function createGameCard({
     coverAlt,
     game_mode,
 }) {
+    const displayRating = rating === "N/A" || !rating ? "0.0" : rating;
     const loggedIn = isUserLoggedIn();
     const card = document.createElement("div");
     card.className =
@@ -362,14 +371,14 @@ function createGameCard({
     <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60"></div>
 
     <div class="absolute top-3 right-3 bg-black/60 backdrop-blur text-white text-xs font-bold px-2 py-1 rounded border border-white/20">
-      ${rating}
+      ${genres}
     </div>
 
     <div class="game-info absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-primary/90 to-primary/80 backdrop-blur-md border-t border-white/10 text-white">
       <h3 class="text-xl font-bold mb-1">${name}</h3>
       <div class="flex items-center gap-3 text-sm text-white/80 mb-3">
         <span class="flex items-center gap-1">
-          <span class="material-icons text-xs">star</span> ${rating}
+          <span class="material-icons text-xs">star</span> ${displayRating}
         </span>
         <span>•</span>
         <span>${genres}</span>
@@ -491,7 +500,11 @@ function renderPagination({ currentPage, totalPages }) {
     nextBtn.onclick = () => fetchGames(currentPage + 1);
     pagination.appendChild(nextBtn);
 }
-
+const searchInput = document.getElementById("search-input");
+const filterGenre = document.getElementById("filter-genre");
+const filterPlatform = document.getElementById("filter-platform");
+const filterRating = document.getElementById("filter-rating");
+const btnReset = document.getElementById("reset-filters");
 async function fetchGames(page = 1) {
     try {
         const respuesta = await fetch(
@@ -500,7 +513,6 @@ async function fetchGames(page = 1) {
         );
 
         const resultado = await respuesta.json();
-        console.log("Resultado:", resultado);
 
         if (!respuesta.ok)
             throw new Error(resultado.error || "Error al obtener los juegos");
@@ -513,7 +525,6 @@ async function fetchGames(page = 1) {
             .getElementById("resultados")
             .scrollIntoView({ behavior: "smooth" });
     } catch (error) {
-        console.error("Error fetchGames:", error);
         document.getElementById("resultados").innerHTML = `
             <p class="text-red-400 text-center col-span-full">
                 ${error.message}
@@ -521,4 +532,82 @@ async function fetchGames(page = 1) {
     }
 }
 
+// Reseteo del form de search
+btnReset.addEventListener("click", (e) => {
+    e.preventDefault();
+    searchInput.value = "";
+    filterGenre.value = "Genero";
+    filterPlatform.value = "Platform";
+    filterRating.value = "Rating";
+    fetchGames(1);
+});
 fetchGames(1);
+
+//EVENTOS
+const sectionDescubrir = document.getElementById("buscador");
+const sectionPerfil = document.getElementById("perfil");
+const sectionEventos = document.getElementById("eventos-section");
+const navEventoMobile = document.getElementById("nav-eventos-mobile");
+// Referencias a los botones del Nav
+const btnEventos = document.getElementById("nav-eventos");
+
+navEventoMobile.addEventListener("click", () => {
+    sectionDescubrir.classList.add("hidden");
+    sectionPerfil.classList.add("hidden");
+    sectionEventos.classList.remove("hidden");
+
+    // 2. Cargar los datos de la API
+    loadIGDBEvents();
+});
+btnEventos.addEventListener("click", () => {
+    // 1. Mostrar/Ocultar secciones
+    sectionDescubrir.classList.add("hidden");
+    sectionPerfil.classList.add("hidden");
+    sectionEventos.classList.remove("hidden");
+
+    // 2. Cargar los datos de la API
+    loadIGDBEvents();
+});
+
+// Función para cargar eventos
+async function loadIGDBEvents() {
+    const container = document.getElementById("eventos-container");
+    try {
+        const respuesta = await fetch("http://localhost:3000/events", {
+            method: "POST",
+            credentials: "include",
+        });
+
+        const events = await respuesta.json();
+        console.log("Respuesta IGDB:", events);
+        renderEventCards(events);
+    } catch (error) {
+        container.innerHTML = `<div class="text-red-500">Error: ${error.message}</div>`;
+    }
+}
+
+function renderEventCards(events) {
+    const container = document.getElementById("eventos-container");
+    container.innerHTML = "";
+
+    events.forEach((event) => {
+        const date = new Date(event.start_time * 1000).toLocaleDateString();
+
+        const imgUrl = event.event_logo
+            ? `https:${event.event_logo.url.replace("t_thumb", "t_cover_big")}`
+            : "https://via.placeholder.com/400x200?text=No+Image";
+        console.log(imgUrl);
+        container.innerHTML += `
+            <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 transition-transform hover:scale-[1.02]">
+                <img src="${imgUrl}" class="w-full h-48 object-cover" alt="${event.name}">
+                <div class="p-6">
+                    <span class="text-xs font-bold text-primary uppercase tracking-wider">${date}</span>
+                    <h3 class="text-xl font-bold mt-2 text-gray-900 dark:text-white">${event.name}</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mt-3 text-sm line-clamp-3">
+                        ${event.description || "No hay detalles adicionales para este evento."}
+                    </p>
+                </div>
+            </div>
+        `;
+    });
+}

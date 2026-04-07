@@ -11,3 +11,5 @@ x.html
 depen.txt
 infoJuegos.txt
 infoJuegos.txtgit push -u origin master
+# Local Netlify folder
+.netlify

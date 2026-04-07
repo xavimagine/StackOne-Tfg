@@ -40,7 +40,54 @@ const logsRoutes = require("./routes/logsRoutes");
 app.use("/games", gameRoutes);
 app.use("/", authRoutes);
 app.use("/logs", logsRoutes);
+// En tu servidor Node.js
+app.post("/events", async (req, res) => {
+    try {
+        // PASO 1: Obtener token
+        const authResponse = await fetch(
+            `https://id.twitch.tv/oauth2/token?client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&grant_type=client_credentials`,
+            { method: "POST" },
+        );
 
+        const authData = await authResponse.json();
+        console.log("Auth completa:", authData);
+        if (!authData.access_token) {
+            return res.status(401).json({
+                error: "No se obtuvo access_token",
+                detalle: authData,
+            });
+        }
+
+        const accessToken = authData.access_token;
+        const clientId = process.env.TWITCH_CLIENT_ID;
+
+        // PASO 3: Llamada a IGDB
+        const response = await fetch("https://api.igdb.com/v4/events", {
+            method: "POST",
+            headers: {
+                "Client-ID": clientId,
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "text/plain",
+                Accept: "application/json",
+            },
+            body: "fields name, description, start_time, event_logo.url; sort start_time asc; limit 10;",
+        });
+
+        const events = await response.json();
+        console.log("IGDB:", events);
+
+        if (!Array.isArray(events)) {
+            return res.status(500).json({
+                error: "Respuesta inesperada de IGDB",
+                detalle: events,
+            });
+        }
+
+        res.json(events);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 app.listen(3000, () => {
     console.log("Servidor escuchando en http://localhost:3000");
 });

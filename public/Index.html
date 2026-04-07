@@ -49,12 +49,9 @@
         
         <!-- LINKS NAVEGACIÓN -->
         <div class="hidden lg:flex items-center justify-center gap-8">
-          <a class="px-4 py-2 text-primary bg-primary/10 rounded-full font-medium transition hover:bg-primary/20" id="nav-descubrir">Descubrir</a>
-          <a class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium flex items-center gap-1" id="nav-perfil">
-            Perfil 
-          </a>
-          <a class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium" href="#">Eventos</a>
-          <a class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium" href="#">Recommendations</a>
+          <a id="nav-descubrir" class="nav-link cursor-pointer px-4 py-2 rounded-full font-medium transition text-gray-600 dark:text-gray-300 hover:text-primary">Descubrir</a>
+          <a class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium flex items-center gap-1" id="nav-perfil">Perfil</a>
+          <a class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium" id="nav-eventos">Eventos</a>
         </div>
         <!-- DERECHA: TEMA + LOGIN/AVATAR -->
         <div class="flex items-center gap-4 shrink-0">
@@ -96,7 +93,7 @@
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700">Usuario</label>
-                    <input type="text" name="usuario" id="loguser" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm p-2 border" placeholder="Tu usuario">
+                    <input minlength="3" type="text" name="usuario" id="loguser" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm p-2 border" placeholder="Tu usuario">
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700">Contraseña</label>
@@ -122,12 +119,10 @@
       </div>
     </nav></nav>
     <!-- MENU DESPLEGAGLE -->
-    <div id="mobile-menu" class="hidden lg:hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4">
-      <div class="flex flex-col gap-4">
-        <a class="px-4 py-2 text-primary bg-primary/10 rounded-full font-medium w-fit" id="nav-descubrir-mobile">Descubrir</a>
+<div id="mobile-menu" class="hidden lg:hidden fixed inset-x-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 z-[100] shadow-2xl">      <div class="flex flex-col gap-4">
+        <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" id="nav-descubrir-mobile">Descubrir</a>
         <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" id="nav-perfil-mobile">Perfil</a>
-        <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" href="#">Eventos</a>
-        <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" href="#">Recommendations</a>
+        <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" id="nav-eventos-mobile">Eventos</a>
       </div>
     </div>
     <!-- Buscador -->
@@ -145,7 +140,7 @@
               community events on stackOne.
             </p>
             <div class="relative max-w-md">
-              <input
+              <input  id="search-input"
                 class="w-full pl-12 pr-4 py-4 rounded-xl bg-white/20 backdrop-blur border border-white/30 text-white placeholder-white/60 focus:outline-none focus:bg-white/30 focus:border-white transition shadow-xl"
                 placeholder="Search for games..."
                 type="text" />
@@ -174,13 +169,13 @@
                 <span class="material-icons text-primary">filter_list</span>
                 Busqueda
               </h2>
-              <button class="text-sm text-primary font-medium hover:underline">
+              <button  id="reset-filters" class="text-sm text-primary font-medium hover:underline">
                 Resetear todo
               </button>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div class="relative group">
-                <select
+                <select id="filter-genre"
                   class="w-full appearance-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer">
                   <option>Genero</option>
                   <option value="Adventure">Aventuras</option>
@@ -202,7 +197,7 @@
                 >
               </div>
               <div class="relative">
-                <select
+                <select id="filter-platform"
                   class="w-full appearance-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer">
                   <option>Platform</option>
                   <option>PC</option>
@@ -221,7 +216,7 @@
                 >
               </div>
               <div class="relative">
-                <select
+                <select id="filter-rating"
                   class="w-full appearance-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer">
                   <option>Rating</option>
                   <option value="90">+90</option>
@@ -319,14 +314,22 @@
               Abandonados
             </a>
           </nav>
-
           </div>
-
         </div>
-
       </main>
     </section>
     </main>
+    <section id="eventos-section" class="hidden min-h-screen">
+  <div class="max-w-7xl mx-auto px-6 py-12">
+    <h2 class="text-3xl font-bold mb-8 text-gray-900 dark:text-white flex items-center gap-3">
+      <span class="material-icons text-primary">event</span>
+      Eventos
+    </h2>
+    <div id="eventos-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <p class="text-gray-500 animate-pulse">Cargando eventos de IGDB...</p>
+    </div>
+  </div>
+</section>
     <footer
       class="bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-800 mt-12 py-8">
       <div
