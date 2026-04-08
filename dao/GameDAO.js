@@ -17,6 +17,7 @@ class GameDAO {
     }
 
     static async buscarConPaginacion(
+        userId = 0,
         texto = "",
         orden = "name",
         direccion = "asc",
@@ -35,21 +36,37 @@ class GameDAO {
         let query = supabase
             .from("games")
             .select(
-                "id, id_game, name, cover, genres, rating, game_modes, company",
-                { count: "planned" }, // <--- CAMBIADO DE "exact" A "planned"
+                `
+                id, 
+                id_game, 
+                name, 
+                cover, 
+                genres, 
+                rating, 
+                game_modes, 
+                company,
+                listas_games!left(status)
+            `,
+                { count: "planned" },
             )
+            .eq("listas_games.user_id", userId)
             .order(orden, { ascending: direccion === "asc" });
 
-        if (texto && texto.trim() !== "") {
+        // --- VALIDACIONES SEGURAS PARA .trim() ---
+        if (texto && typeof texto === "string" && texto.trim() !== "") {
             query = query.ilike("name", `%${texto.trim()}%`);
         }
 
-        if (genero && genero.trim() !== "") {
-            query = query.contains("genres", [genero]);
+        if (genero && typeof genero === "string" && genero.trim() !== "") {
+            query = query.contains("genres", [genero.trim()]);
         }
 
-        if (plataforma && plataforma.trim() !== "") {
-            query = query.contains("platforms", [plataforma]);
+        if (
+            plataforma &&
+            typeof plataforma === "string" &&
+            plataforma.trim() !== ""
+        ) {
+            query = query.contains("platforms", [plataforma.trim()]);
         }
 
         if (rating !== null) {
@@ -65,31 +82,19 @@ class GameDAO {
             try {
                 const { data, count, error } = await query;
 
-                if (error) {
-                    if (
-                        error.message.includes("timeout") ||
-                        error.code === "57014"
-                    ) {
-                        throw error;
-                    }
-                    throw new Error(error.message);
-                }
+                if (error) throw error;
 
-                return { games: data, total: count };
+                const gamesConStatus = data.map((game) => ({
+                    ...game,
+                    user_status: game.listas_games?.[0]?.status || null,
+                }));
+
+                return { games: gamesConStatus, total: count };
             } catch (err) {
                 intentos++;
-                console.warn(
-                    `Intento ${intentos} fallido para [${texto || "Lista General"}]. Reintentando...`,
-                );
-
-                if (intentos >= maxIntentos) {
-                    console.error("Error definitivo:", err.message);
-                    return { games: [], total: 0 };
-                }
-
-                await new Promise((resolve) =>
-                    setTimeout(resolve, intentos * 2000),
-                );
+                console.warn(`Intento ${intentos} fallido. Reintentando...`);
+                if (intentos >= maxIntentos) return { games: [], total: 0 };
+                await new Promise((res) => setTimeout(res, intentos * 1000));
             }
         }
     }

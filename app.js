@@ -1,9 +1,13 @@
 const express = require("express");
-
-//Importamos el módulo que sabe crear y gestionar sesiones en Express
+const cors = require("cors");
 const session = require("express-session");
 const app = express();
-
+app.use(
+    cors({
+        origin: "http://localhost:5173",
+        credentials: true,
+    }),
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -15,9 +19,7 @@ app.use(
         resave: false,
         saveUninitialized: false,
         cookie: {
-            // 1 hora de duración (en milisegundos)
             maxAge: 3600000,
-            // 'secure' debe ser true en Netlify (HTTPS), pero false en local (HTTP)
             secure: process.env.NODE_ENV === "production",
             // Ayuda a prevenir ataques XSS
             httpOnly: true,
@@ -34,7 +36,13 @@ app.use((req, res, next) => {
     );
     next();
 });
-
+app.use((req, res, next) => {
+    console.log("--- DEBUG SESIÓN ---");
+    console.log("ID Sesión:", req.sessionID);
+    console.log("Usuario en sesión:", req.session.usuario);
+    console.log("--------------------");
+    next();
+});
 // juegos
 const gameRoutes = require("./routes/gameRoutes");
 

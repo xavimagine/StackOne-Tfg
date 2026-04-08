@@ -1,12 +1,12 @@
 const { supabase } = require("../db/database");
-
+const ListasDAO = require("../dao/listasDAO");
 class ListaController {
     static async toggle(req, res) {
         try {
             const user_id = req.session.usuario?.id;
             const { game_id, status } = req.body;
 
-            // 1. Validación de seguridad
+            //  Validación de seguridad
             if (!user_id || !game_id || !status) {
                 return res
                     .status(400)
@@ -16,20 +16,17 @@ class ListaController {
             const statusLimpio = status.trim().toLowerCase();
             const gameIdNum = parseInt(game_id, 10);
 
-            // 2. Buscamos si el juego YA está en cualquier lista del usuario
             const { data: existing, error: selectError } = await supabase
                 .from("listas_games")
                 .select("id, status")
                 .eq("user_id", user_id)
-                .eq("game_id", gameIdNum) // Buscamos solo por juego, ignoramos el status aquí
+                .eq("game_id", gameIdNum)
                 .maybeSingle();
 
             if (selectError) throw selectError;
 
-            // 3. Lógica de Decisión (Toggle / Update / Insert)
             if (existing) {
                 if (existing.status === statusLimpio) {
-                    // Caso A: El usuario pulsa el mismo botón -> Quitar de la lista
                     const { error: deleteError } = await supabase
                         .from("listas_games")
                         .delete()
@@ -38,7 +35,6 @@ class ListaController {
                     if (deleteError) throw deleteError;
                     return res.json({ action: "removed" });
                 } else {
-                    // Caso B: El juego ya estaba (ej. 'jugando') pero pulsa otro (ej. 'acabado') -> Actualizar
                     const { error: updateError } = await supabase
                         .from("listas_games")
                         .update({ status: statusLimpio })
@@ -51,7 +47,6 @@ class ListaController {
                     });
                 }
             } else {
-                // Caso C: El juego no estaba en ninguna lista -> Insertar nuevo
                 const { error: insertError } = await supabase
                     .from("listas_games")
                     .insert({
@@ -71,38 +66,34 @@ class ListaController {
 
     static async obtenerProgreso(req, res) {
         try {
-            const user_id = req.session.usuario?.id || req.query.user_id;
+            const userId = req.session.usuario?.id;
 
-            if (!user_id) {
+            if (!userId) {
                 return res
-                    .status(400)
-                    .json({ error: "Usuario no identificado" });
+                    .status(401)
+                    .json({ ok: false, mensaje: "Sin sesión" });
             }
 
-            // Usamos head:true para no traer datos, solo el conteo
-            const { count, error } = await supabase
-                .from("listas_games")
-                .select("*", { count: "planned", head: true })
-                .eq("user_id", user_id)
-                .eq("status", "acabado");
+            const resultado = await ListasDAO.obtenerConteoPorEstado(userId);
 
-            if (error) throw error;
+            const totalAcabados = resultado.data?.acabado || 0;
 
-            const XP_POR_JUEGO = 100;
             const XP_MAX_NIVEL = 3000;
-            const xpTotal = (count || 0) * XP_POR_JUEGO;
+            const XP_POR_JUEGO = 100;
+            const xpTotal = totalAcabados * XP_POR_JUEGO;
+
             const nivel = 1 + Math.floor(xpTotal / XP_MAX_NIVEL);
             const xpBarra = xpTotal % XP_MAX_NIVEL;
 
             return res.json({
-                nivel: nivel,
-                xpBarra: xpBarra,
+                ok: true,
+                nivel,
+                xpBarra,
                 xpMax: XP_MAX_NIVEL,
-                totalAcabados: count || 0,
+                totalAcabados,
             });
         } catch (error) {
-            console.error("Error en obtenerProgreso:", error.message);
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ ok: false, error: error.message });
         }
     }
 }

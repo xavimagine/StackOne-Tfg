@@ -24,6 +24,8 @@ class GameController {
 
     static async buscarConPaginacion(req, res) {
         try {
+            const userId = req.session.userId || 0;
+
             const texto = req.query.texto || "";
             const orden = req.query.orden || "name";
             const direccion = req.query.direccion || "asc";
@@ -36,6 +38,7 @@ class GameController {
                 : null;
 
             const { games, total } = await GameDAO.buscarConPaginacion(
+                userId,
                 texto,
                 orden,
                 direccion,
@@ -45,6 +48,7 @@ class GameController {
                 plataforma,
                 rating,
             );
+
             res.json({
                 games,
                 pagination: {

@@ -211,6 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 bienvenida.textContent = `¡ Bienvenido ${resultado.nick} !`;
                 currentUserId = resultado.id;
                 fetchGames(currentPage);
+                actualizarProgresoVisual();
             }
         } catch (error) {
             const usuarioAfectado = data.usuario || data.email || "Desconocido";
@@ -285,7 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const colorMap = {
         jugando: "text-fuchsia-400",
         deseado: "text-pink-500",
-        completado: "text-yellow-500",
+        acabado: "text-yellow-500",
         abandonado: "text-red-500",
     };
 
@@ -298,6 +299,7 @@ document.addEventListener("DOMContentLoaded", () => {
         coverAlt,
         game_mode,
         game_id,
+        userStatus,
     }) {
         const displayRating = rating === "N/A" || !rating ? "0.0" : rating;
         const loggedIn = isUserLoggedIn();
@@ -305,61 +307,69 @@ document.addEventListener("DOMContentLoaded", () => {
             coverImage && coverImage !== "null" && coverImage !== "undefined"
                 ? coverImage
                 : "assets/default/default-cover.png";
+
         const card = document.createElement("div");
+
+        // Función para determinar el color inicial (Carga de página)
+        const getIconClass = (statusKey) => {
+            if (!loggedIn || !userStatus) return "text-white/40";
+            // Normalizamos a minúsculas para evitar errores de comparación
+            return userStatus.toLowerCase() === statusKey.toLowerCase()
+                ? colorMap[statusKey]
+                : "text-white/40";
+        };
+
         card.className =
             "game-card relative group rounded-xl overflow-hidden shadow-lg h-64 cursor-pointer bg-gray-900";
-        card.innerHTML = `
-        <img alt="${coverAlt || name}" class="game-cover w-full h-full object-cover" src="${finalCover}" />
-        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60"></div>
-        <div class="absolute top-3 right-3 bg-black/60 backdrop-blur text-white text-xs font-bold px-2 py-1 rounded border border-white/20">
-            ${genres}
-        </div>
-        <div class="game-info absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-primary/90 to-primary/80 backdrop-blur-md border-t border-white/10 text-white">
-            <h3 class="text-xl font-bold mb-1">${name}</h3>
-            <div class="flex items-center gap-3 text-sm text-white/80 mb-3">
-                <span class="flex items-center gap-1">
-                    <span class="material-icons text-xs">star</span> ${displayRating}
-                </span>
-                <span>•</span>
-                <span>${genres}</span>
-            </div>
-            <p class="text-xs text-white/70 mb-3 line-clamp-2">${game_mode}</p>
-            <div class="text-xs font-medium text-white/90">Released: ${company}</div>
-            ${
-                loggedIn
-                    ? `
-            <section class="flex flex-row items-center justify-center gap-1 sm:gap-2 w-full p-1" data-game-id="${game_id}">
-                <a class="lista-btn flex items-center justify-center p-3 cursor-pointer rounded-xl hover:bg-white/10 transition-all duration-200" data-status="jugando" title="Jugando">
-                    <span class="material-icons-round text-white/40">bookmark</span>
-                </a>
-                <a class="lista-btn flex items-center justify-center p-3 cursor-pointer rounded-xl hover:bg-white/10 transition-all duration-200" data-status="deseado" title="Deseado">
-                    <span class="material-icons-round text-white/40">favorite</span>
-                </a>
-                <a class="lista-btn flex items-center justify-center p-3 cursor-pointer rounded-xl hover:bg-white/10 transition-all duration-200" data-status="acabado" title="Acabado">
-                    <span class="material-icons-round text-white/40">emoji_events</span>
-                </a>
-                <a class="lista-btn flex items-center justify-center p-3 cursor-pointer rounded-xl hover:bg-white/10 transition-all duration-200" data-status="abandonado" title="Abandonado">
-                    <span class="material-icons-round text-white/40">close</span>
-                </a>
-            </section>`
-                    : ""
-            }
-        </div>`;
 
-        // Eventos de los botones de lista
+        card.innerHTML = `
+    <img alt="${coverAlt || name}" class="game-cover w-full h-full object-cover" src="${finalCover}" />
+    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60"></div>
+    <div class="absolute top-3 right-3 bg-black/60 backdrop-blur text-white text-xs font-bold px-2 py-1 rounded border border-white/20">
+        ${genres}
+    </div>
+    <div class="game-info absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-primary/90 to-primary/80 backdrop-blur-md border-t border-white/10 text-white">
+        <h3 class="text-xl font-bold mb-1">${name}</h3>
+        <div class="flex items-center gap-3 text-sm text-white/80 mb-3">
+            <span class="flex items-center gap-1">
+                <span class="material-icons text-xs">star</span> ${displayRating}
+            </span>
+            <span>•</span>
+            <span>${genres}</span>
+        </div>
+        <p class="text-xs text-white/70 mb-3 line-clamp-2">${game_mode}</p>
+        <div class="text-xs font-medium text-white/90">Released: ${company}</div>
+        ${
+            loggedIn
+                ? `
+        <section class="flex flex-row items-center justify-center gap-1 sm:gap-2 w-full p-1" data-game-id="${game_id}">
+            <a class="lista-btn flex items-center justify-center p-3 cursor-pointer rounded-xl hover:bg-white/10 transition-all duration-200" data-status="jugando" title="Jugando">
+                <span class="material-icons-round ${getIconClass("jugando")}">bookmark</span>
+            </a>
+            <a class="lista-btn flex items-center justify-center p-3 cursor-pointer rounded-xl hover:bg-white/10 transition-all duration-200" data-status="deseado" title="Deseado">
+                <span class="material-icons-round ${getIconClass("deseado")}">favorite</span>
+            </a>
+            <a class="lista-btn flex items-center justify-center p-3 cursor-pointer rounded-xl hover:bg-white/10 transition-all duration-200" data-status="acabado" title="Acabado">
+                <span class="material-icons-round ${getIconClass("acabado")}">emoji_events</span>
+            </a>
+            <a class="lista-btn flex items-center justify-center p-3 cursor-pointer rounded-xl hover:bg-white/10 transition-all duration-200" data-status="abandonado" title="Abandonado">
+                <span class="material-icons-round ${getIconClass("abandonado")}">close</span>
+            </a>
+        </section>`
+                : ""
+        }
+    </div>`;
+
+        // Manejo de eventos de clic
         if (loggedIn) {
             card.querySelectorAll(".lista-btn").forEach((btn) => {
                 btn.addEventListener("click", async (e) => {
                     e.stopPropagation();
                     const status = btn.dataset.status;
-                    const gameIdContainer = btn.closest(
-                        "section[data-game-id]",
-                    );
-                    const game_id = gameIdContainer
-                        ? gameIdContainer.dataset.gameId
-                        : null;
+                    const section = btn.closest("section");
+                    const game_id = section.dataset.gameId;
                     const icon = btn.querySelector("span");
-                    console.log("Intentando guardar:", { game_id, status }); // <-- MIRA ESTO EN CONSOLA
+
                     try {
                         const resp = await fetch(
                             "http://localhost:3000/games/lista",
@@ -367,31 +377,39 @@ document.addEventListener("DOMContentLoaded", () => {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
                                 credentials: "include",
-                                body: JSON.stringify({
-                                    game_id,
-                                    status,
-                                }),
+                                body: JSON.stringify({ game_id, status }),
                             },
                         );
+
                         const result = await resp.json();
+
                         if (resp.ok) {
+                            // 1. Apagamos todos los iconos de esta sección (volver a gris)
+                            section.querySelectorAll("span").forEach((s) => {
+                                // Quitamos todas las posibles clases de color de colorMap
+                                Object.values(colorMap).forEach((cls) =>
+                                    s.classList.remove(cls),
+                                );
+                                s.classList.add("text-white/40");
+                            });
+
+                            // 2. Si el servidor dice "added", encendemos solo el clicado
                             if (result.action === "added") {
                                 icon.classList.remove("text-white/40");
                                 icon.classList.add(colorMap[status]);
-                                if (status === "completado") {
-                                    actualizarProgresoVisual();
-                                }
-                            } else {
-                                icon.classList.remove(colorMap[status]);
-                                icon.classList.add("text-white/40");
+                            }
 
-                                if (status === "completado") {
-                                    actualizarProgresoVisual();
-                                }
+                            // 3. Actualizar nivel si el estado es 'acabado'
+                            // (Nota: Asegúrate de que tu colorMap use 'acabado' o 'completado' según tu lógica)
+                            if (
+                                status === "acabado" ||
+                                status === "completado"
+                            ) {
+                                actualizarProgresoVisual();
                             }
                         }
                     } catch (err) {
-                        console.error("Error al guardar en lista:", err);
+                        console.error("Error al actualizar la lista:", err);
                     }
                 });
             });
@@ -399,7 +417,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return card;
     }
-
     function renderCards(games) {
         const container = document.getElementById("resultados");
         container.className =
@@ -415,6 +432,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 coverAlt: game.name,
                 game_mode: game.game_modes,
                 game_id: game.id_game,
+                userStatus: game.user_status,
             });
             container.appendChild(card);
         });
@@ -507,21 +525,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 `http://localhost:3000/games/buscar?${params.toString()}`,
                 { credentials: "include" },
             );
+
             const resultado = await respuesta.json();
+
             if (!respuesta.ok)
                 throw new Error(
                     resultado.error || "Error al obtener los juegos",
                 );
 
             currentPage = resultado.pagination.currentPage;
+
             renderCards(resultado.games);
+
             renderPagination(resultado.pagination);
-            document
-                .getElementById("resultados")
-                .scrollIntoView({ behavior: "smooth" });
+
+            if (page !== 1) {
+                document
+                    .getElementById("resultados")
+                    .scrollIntoView({ behavior: "smooth" });
+            }
         } catch (error) {
             document.getElementById("resultados").innerHTML = `
-                <p class="text-red-400 text-center col-span-full">${error.message}</p>`;
+            <p class="text-red-400 text-center col-span-full">${error.message}</p>`;
         }
     }
 
@@ -609,36 +634,49 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     fetchGames(1);
-    if (isUserLoggedIn()) {
-        actualizarProgresoVisual();
-    }
 });
 
 //FUNCION PARA SUBIR LEVEL USUARIO
 async function actualizarProgresoVisual() {
     try {
-        const response = await fetch("/games/progreso");
-        const data = await response.json();
+        const res = await fetch(
+            `http://localhost:3000/games/progreso?t=${Date.now()}`,
+            {
+                method: "GET",
+                credentials: "include",
+            },
+        );
 
-        if (data.error) return;
+        if (res.status === 401)
+            return console.warn("Inicia sesión para ver progreso");
 
-        // Buscamos los elementos
-        const levelElem = document.getElementById("user-level");
-        const xpTextElem = document.getElementById("xp-text");
-        const barFillElem = document.getElementById("xp-bar-fill");
-        if (levelElem) {
-            levelElem.textContent = `Level ${data.nivel} Explorer`;
-        }
+        const data = await res.json();
 
-        if (xpTextElem) {
-            xpTextElem.textContent = `${data.xpBarra.toLocaleString()} / ${data.xpMax.toLocaleString()}`;
-        }
-
-        if (barFillElem) {
+        if (data.ok) {
+            // 1. Calcular el porcentaje
             const porcentaje = (data.xpBarra / data.xpMax) * 100;
-            barFillElem.style.width = `${porcentaje}%`;
+
+            // 2. Seleccionar los elementos (Asegúrate de que estos IDs existan en tu HTML)
+            const fill = document.getElementById("xp-bar-fill");
+            const nivelTxt = document.getElementById("user-level");
+            const xpDetalle = document.getElementById("xp-text");
+
+            // 3. Pintar con animación
+            if (fill) {
+                fill.style.width = `${porcentaje}%`;
+            }
+            if (nivelTxt) {
+                nivelTxt.innerText = `Nivel ${data.nivel}`;
+            }
+            if (xpDetalle) {
+                xpDetalle.innerText = `${data.xpBarra} / ${data.xpMax} XP`;
+            }
+
+            console.log(
+                `Barra pintada al ${porcentaje}% para el nivel ${data.nivel}`,
+            );
         }
-    } catch (error) {
-        console.error("Error al cargar el progreso:", error);
+    } catch (err) {
+        console.error("Error al actualizar la barra:", err);
     }
 }

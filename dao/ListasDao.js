@@ -3,20 +3,24 @@ const { supabase } = require("../db/database");
 class ListasDAO {
     static async obtenerConteoPorEstado(userId) {
         try {
+            // IMPORTANTE: Asegúrate de que la tabla sea "listas_games"
+            // como en tus controladores anteriores, o "listas_juegos".
             const { data, error } = await supabase
-                .from("listas_juegos")
+                .from("listas_games")
                 .select("status")
                 .eq("user_id", userId);
 
             if (error) throw error;
 
-            // Procesamos los datos para devolver un objeto con los totales
             const conteo = data.reduce(
                 (acc, curr) => {
-                    acc[curr.status] = (acc[curr.status] || 0) + 1;
+                    const s = curr.status.toLowerCase();
+                    if (acc.hasOwnProperty(s)) {
+                        acc[s]++;
+                    }
                     return acc;
                 },
-                { jugando: 0, completado: 0, deseado: 0, abandonado: 0 },
+                { jugando: 0, acabado: 0, deseado: 0, abandonado: 0 },
             );
 
             return { ok: true, data: conteo };
@@ -25,10 +29,11 @@ class ListasDAO {
             return { ok: false, error: error.message };
         }
     }
+
     static async obtenerJuegosPorLista(userId, status) {
         try {
             const { data, error } = await supabase
-                .from("listas_juegos")
+                .from("listas_games")
                 .select(
                     `
                     id_relacion,
@@ -36,10 +41,10 @@ class ListasDAO {
                     fecha_agregado,
                     games (
                         id,
+                        id_game,
                         name,
-                        description,
                         cover,
-                        genres
+                        genres,
                         platforms,
                         rating,
                         company
@@ -47,20 +52,34 @@ class ListasDAO {
                 `,
                 )
                 .eq("user_id", userId)
-                .eq("status", status);
+                .eq("status", status.toLowerCase());
 
             if (error) throw error;
 
-            // Limpiamos la respuesta para que sea más fácil de usar en el frontend
-            const juegosFormateados = data.map((item) => ({
-                status: item.status,
-                fecha: item.fecha_agregado,
-                ...item.games, // Expandimos la info del juego directamente
-            }));
+            // Limpiamos la respuesta y manejamos posibles nulos
+            const juegosFormateados = data
+                .filter((item) => item.games !== null) // Evita errores si un juego fue borrado de la tabla principal
+                .map((item) => ({
+                    id_relacion: item.id_relacion,
+                    status: item.status,
+                    fecha: item.fecha_agregado,
+                    ...item.games,
+                }));
 
             return { success: true, data: juegosFormateados };
         } catch (error) {
+            console.error("Error en obtenerJuegosPorLista:", error.message);
             return { success: false, error: error.message };
+        }
+    }
+
+    static async obtenerProgreso(req, res) {
+        const userId = req.session.usuario?.id;
+        const resultado = await ListasDAO.obtenerConteoPorEstado(userId);
+
+        if (resultado.ok) {
+            // Aquí calculas el nivel con resultado.data.acabado
+            // ...
         }
     }
 }
