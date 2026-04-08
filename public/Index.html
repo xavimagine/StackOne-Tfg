@@ -61,7 +61,7 @@
             <span class="material-icons hidden dark:block text-yellow-400">light_mode</span>
           </button>
           <!-- DROPDOWN CONTAINER -->
-          <div class="relative inline-block text-left" id="dropdown-container">
+          <div class="relative inline-block text-left z-[110]" id="dropdown-container">
             <!-- VISTA LOGUEADO -->
             <div id="logged-in-view" class="hidden">
               <div class="flex items-center gap-3">
@@ -83,8 +83,7 @@
               </button>
             </div>
             <!-- DROPDOWN MENU -->
-            <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-72 origin-top-right rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50 overflow-hidden">
-              <div class="p-6">
+<div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-72 origin-top-right rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50 overflow-hidden">              <div class="p-6">
                 <h3 id="form-title" class="text-xl font-bold text-gray-900 mb-4">Iniciar Sesión</h3>
                 <form id="usuario-form" class="space-y-4" novalidate>
                   <div id="verify-email" class="hidden">
@@ -119,12 +118,13 @@
       </div>
     </nav></nav>
     <!-- MENU DESPLEGAGLE -->
-<div id="mobile-menu" class="hidden lg:hidden fixed inset-x-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 z-[100] shadow-2xl">      <div class="flex flex-col gap-4">
-        <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" id="nav-descubrir-mobile">Descubrir</a>
-        <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" id="nav-perfil-mobile">Perfil</a>
-        <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" id="nav-eventos-mobile">Eventos</a>
-      </div>
-    </div>
+<div id="mobile-menu" class="hidden lg:hidden fixed top-[73px] inset-x-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 z-[90] shadow-2xl">
+  <div class="flex flex-col gap-4">
+    <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" id="nav-descubrir-mobile">Descubrir</a>
+    <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" id="nav-perfil-mobile">Perfil</a>
+    <a class="text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition" id="nav-eventos-mobile">Eventos</a>
+  </div>
+</div>
     <!-- Buscador -->
     <div id="buscador">
       <header class="bg-accent-brown dark:bg-[#3d2925] py-16 px-6 relative overflow-hidden">
@@ -149,6 +149,7 @@
                 >search</span
               >
             </div>
+            <button class="relative z-0 h-12 rounded-full bg-blue-500 px-6 text-neutral-50 after:absolute after:left-0 after:top-0 after:-z-10 after:h-full after:w-full after:rounded-full after:bg-primary active:scale-95 active:transition active:after:scale-x-125 active:after:scale-y-150 active:after:opacity-0 active:after:transition active:after:duration-500" id="btn-search">Buscar</button>
           </div>
           <div class="hidden md:flex justify-center">
             <div
@@ -269,18 +270,25 @@
             </div>
             <h2 class="mt-4 text-xl font-bold text-gray-900 dark:text-white" id="Nombreuser">
             </h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              Level 42 Explorer
+            <p  id="user-level" class="text-sm text-gray-500 dark:text-gray-400">
+              Level 1 Explorer
             </p>
-            <div class="w-full mt-4">
-              <div class="flex justify-between text-xs mb-1 text-gray-500 font-medium">
-                <span>XP</span>
-                <span>2,450 / 3,000</span>
-              </div>
-              <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div class="bg-primary h-2 rounded-full" style="width: 82%"></div>
-              </div>
+           <div class="w-full mt-4">
+          <div class="flex justify-between text-xs mb-1 text-gray-500 font-medium">
+            <span>XP</span>
+            <span id="xp-text">0 / 3,000</span>
+          </div>
+          
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+            
+            <div 
+              id="xp-bar-fill" 
+              class="bg-purple-600 h-full rounded-full transition-all duration-700 ease-out" 
+              style="width: 0%">
             </div>
+            
+          </div>
+        </div>
           </div>
         </div>
         <!-- MENU  Listas-->
@@ -292,8 +300,7 @@
             </h3>
           </div>
 
-          <nav class="flex flex-col p-2">
-
+<nav class="sticky top-0 z-[100] bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-6 py-4">
             <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" href="#">
               <span class="material-icons-round text-fuchsia-400">bookmark</span>
               Jugando

@@ -28,6 +28,12 @@ app.use(
 );
 
 app.use(express.static("public"));
+app.use((req, res, next) => {
+    console.log(
+        `${new Date().toLocaleTimeString()} - Petición: ${req.method} ${req.url}`,
+    );
+    next();
+});
 
 // juegos
 const gameRoutes = require("./routes/gameRoutes");
@@ -59,7 +65,7 @@ app.post("/events", async (req, res) => {
 
         const accessToken = authData.access_token;
         const clientId = process.env.TWITCH_CLIENT_ID;
-
+        const inicioAnio = Math.floor(new Date("2026-01-01").getTime() / 1000);
         // PASO 3: Llamada a IGDB
         const response = await fetch("https://api.igdb.com/v4/events", {
             method: "POST",
@@ -69,7 +75,10 @@ app.post("/events", async (req, res) => {
                 "Content-Type": "text/plain",
                 Accept: "application/json",
             },
-            body: "fields name, description, start_time, event_logo.url; sort start_time asc; limit 10;",
+            body: `fields name, description, start_time, event_logo.url; 
+                   where start_time > ${inicioAnio}; 
+                   sort start_time asc; 
+                   limit 40;`,
         });
 
         const events = await response.json();

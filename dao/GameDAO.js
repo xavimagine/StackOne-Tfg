@@ -6,8 +6,8 @@ class GameDAO {
         const { data, count, error } = await supabase
             .from("games")
             .select(
-                "id,id_game, name, cover, genres, rating, game_modes, company",
-                { count: "exact" },
+                "id, id_game, name, cover, genres, rating, game_modes, company",
+                { count: "planned" }, // <--- Esto es correcto
             )
             .order("name", { ascending: true })
             .range(offset, offset + limit - 1);
@@ -35,21 +35,21 @@ class GameDAO {
         let query = supabase
             .from("games")
             .select(
-                "id,id_game, name, cover, genres, rating, game_modes, company",
-                { count: "exact" },
+                "id, id_game, name, cover, genres, rating, game_modes, company",
+                { count: "planned" }, // <--- CAMBIADO DE "exact" A "planned"
             )
             .order(orden, { ascending: direccion === "asc" });
 
-        if (texto.trim() !== "") {
-            query = query.ilike("name", `%${texto}%`);
+        if (texto && texto.trim() !== "") {
+            query = query.ilike("name", `%${texto.trim()}%`);
         }
 
-        if (genero.trim() !== "") {
-            query = query.contains("genres", JSON.stringify([genero]));
+        if (genero && genero.trim() !== "") {
+            query = query.contains("genres", [genero]);
         }
 
-        if (plataforma.trim() !== "") {
-            query = query.contains("platforms", JSON.stringify([plataforma]));
+        if (plataforma && plataforma.trim() !== "") {
+            query = query.contains("platforms", [plataforma]);
         }
 
         if (rating !== null) {
@@ -58,9 +58,40 @@ class GameDAO {
 
         query = query.range(offset, offset + limit - 1);
 
-        const { data, count, error } = await query;
-        if (error) throw new Error(error.message);
-        return { games: data, total: count };
+        let intentos = 0;
+        const maxIntentos = 3;
+
+        while (intentos < maxIntentos) {
+            try {
+                const { data, count, error } = await query;
+
+                if (error) {
+                    if (
+                        error.message.includes("timeout") ||
+                        error.code === "57014"
+                    ) {
+                        throw error;
+                    }
+                    throw new Error(error.message);
+                }
+
+                return { games: data, total: count };
+            } catch (err) {
+                intentos++;
+                console.warn(
+                    `Intento ${intentos} fallido para [${texto || "Lista General"}]. Reintentando...`,
+                );
+
+                if (intentos >= maxIntentos) {
+                    console.error("Error definitivo:", err.message);
+                    return { games: [], total: 0 };
+                }
+
+                await new Promise((resolve) =>
+                    setTimeout(resolve, intentos * 2000),
+                );
+            }
+        }
     }
 }
 
