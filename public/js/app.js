@@ -138,6 +138,67 @@ document.addEventListener("DOMContentLoaded", () => {
             enviarPeticion("http://localhost:3000/login", data);
         }
     });
+    // Volver atras en detalles de juego
+    function volverAtras() {
+        document.getElementById("game-detail").classList.add("hidden");
+
+        if (lastView === "perfil") {
+            document.getElementById("perfil").classList.remove("hidden");
+        } else if (lastView === "eventos") {
+            document
+                .getElementById("eventos-section")
+                .classList.remove("hidden");
+        } else {
+            document.getElementById("buscador").classList.remove("hidden");
+        }
+    }
+    // Mostra detalles de un juego
+    let lastView = "buscador";
+    function mostrarDetalleJuego(game) {
+        lastView = document
+            .getElementById("perfil")
+            .classList.contains("hidden")
+            ? "buscador"
+            : "perfil";
+
+        const detail = document.getElementById("game-detail");
+        detail.innerHTML = `
+        <button id="back-btn" class="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700">
+            ← Volver
+        </button>
+
+        <div class="grid md:grid-cols-2 gap-8 items-start">
+            <img
+                src="${game.cover || "assets/default/default-cover.png"}"
+                alt="${game.name}"
+                class="w-full rounded-2xl shadow-xl object-cover"
+            />
+
+            <div class="space-y-4 text-black">
+                <h2 class="text-4xl font-bold">${game.name}</h2>
+                <p class="text-black/80">${game.summary || "Sin descripción disponible."}</p>
+                <div><strong>Géneros:</strong> ${game.genres || "-"}</div>
+                <div><strong>Plataformas:</strong> ${game.platforms || "-"}</div>
+                <div><strong>Rating:</strong> ${game.rating ?? "N/A"}</div>
+                <div><strong>Compañía:</strong> ${game.company || "-"}</div>
+                <div><strong>Modos:</strong> ${game.game_modes || "-"}</div>
+            </div>
+        </div>
+    `;
+
+        document.getElementById("back-btn").addEventListener("click", () => {
+            detail.classList.add("hidden");
+            if (lastView === "perfil") {
+                document.getElementById("perfil").classList.remove("hidden");
+            } else {
+                document.getElementById("buscador").classList.remove("hidden");
+            }
+        });
+
+        document.getElementById("buscador").classList.add("hidden");
+        document.getElementById("perfil").classList.add("hidden");
+        detail.classList.remove("hidden");
+    }
 
     async function enviarPeticion(ruta, data) {
         try {
@@ -294,6 +355,7 @@ document.addEventListener("DOMContentLoaded", () => {
         container.className =
             "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4";
         container.innerHTML = "";
+
         games.forEach((game) => {
             const card = createGameCard({
                 name: game.name,
@@ -305,7 +367,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 game_mode: game.game_modes,
                 game_id: game.id,
                 userStatus: game.user_status,
+                summary: game.summary,
+                platforms: game.platforms,
             });
+
+            card.addEventListener("click", (e) => {
+                if (e.target.closest(".lista-btn")) return;
+                mostrarDetalleJuego({
+                    name: game.name,
+                    genres: game.genres,
+                    rating: game.rating ?? "N/A",
+                    company: game.company,
+                    cover: game.cover,
+                    game_modes: game.game_modes,
+                    summary: game.summary,
+                    platforms: game.platforms,
+                });
+            });
+
             container.appendChild(card);
         });
     }
@@ -649,11 +728,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 emoji_events: "acabado",
                 close: "abandonado",
             };
+
             const iconName = btn.querySelector("span")?.textContent?.trim();
             const status = statusMap[iconName];
             if (!status) return;
 
-            listasGamesContainer.innerHTML = `<p class="text-gray-500 animate-pulse p-4">Cargando juegos...</p>`;
+            listasGamesContainer.innerHTML = `
+            <p class="text-gray-500 animate-pulse p-4">Cargando juegos...</p>
+        `;
 
             try {
                 const resp = await fetch(
@@ -662,19 +744,21 @@ document.addEventListener("DOMContentLoaded", () => {
                         credentials: "include",
                     },
                 );
-                const result = await resp.json();
 
+                const result = await resp.json();
                 listasGamesContainer.innerHTML = "";
 
                 if (!result.ok || result.games.length === 0) {
                     listasGamesContainer.innerHTML = `
-                        <p class="text-gray-400 text-sm p-4 text-center">No tienes juegos en esta lista.</p>`;
+                    <p class="text-gray-400 text-sm p-4 text-center">No tienes juegos en esta lista.</p>
+                `;
                     return;
                 }
 
                 const grid = document.createElement("div");
                 grid.className =
                     "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4 w-full";
+
                 result.games.forEach((game) => {
                     const card = createGameCard({
                         name: game.name,
@@ -686,13 +770,33 @@ document.addEventListener("DOMContentLoaded", () => {
                         game_mode: game.game_modes,
                         game_id: game.id,
                         userStatus: game.user_status,
+                        summary: game.summary,
+                        platforms: game.platforms,
                     });
+
+                    card.addEventListener("click", (ev) => {
+                        if (ev.target.closest(".lista-btn")) return;
+
+                        mostrarDetalleJuego({
+                            name: game.name,
+                            genres: game.genres,
+                            rating: game.rating ?? "N/A",
+                            company: game.company,
+                            cover: game.cover,
+                            game_modes: game.game_modes,
+                            summary: game.summary,
+                            platforms: game.platforms,
+                        });
+                    });
+
                     grid.appendChild(card);
                 });
 
                 listasGamesContainer.appendChild(grid);
             } catch (err) {
-                listasGamesContainer.innerHTML = `<p class="text-red-400 text-sm p-4">Error: ${err.message}</p>`;
+                listasGamesContainer.innerHTML = `
+                <p class="text-red-400 text-sm p-4">Error: ${err.message}</p>
+            `;
             }
         });
     });

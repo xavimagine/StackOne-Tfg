@@ -6,8 +6,8 @@ class GameDAO {
         const { data, count, error } = await supabase
             .from("games")
             .select(
-                "id, id_game, name, cover, genres, rating, game_modes, company",
-                { count: "planned" }, // <--- Esto es correcto
+                "id, id_game, name, summary,cover, genres, rating, game_modes, company",
+                { count: "planned" },
             )
             .order("name", { ascending: true })
             .range(offset, offset + limit - 1);
@@ -39,7 +39,8 @@ class GameDAO {
                 `
                 id, 
                 id_game, 
-                name, 
+                name,
+                summary, 
                 cover, 
                 genres, 
                 rating, 
