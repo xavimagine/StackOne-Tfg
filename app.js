@@ -30,19 +30,7 @@ app.use(
 );
 
 app.use(express.static("public"));
-app.use((req, res, next) => {
-    console.log(
-        `${new Date().toLocaleTimeString()} - Petición: ${req.method} ${req.url}`,
-    );
-    next();
-});
-app.use((req, res, next) => {
-    console.log("--- DEBUG SESIÓN ---");
-    console.log("ID Sesión:", req.sessionID);
-    console.log("Usuario en sesión:", req.session.usuario);
-    console.log("--------------------");
-    next();
-});
+
 // juegos
 const gameRoutes = require("./routes/gameRoutes");
 
@@ -50,10 +38,12 @@ const gameRoutes = require("./routes/gameRoutes");
 const authRoutes = require("./routes/authRoutes");
 // logs
 const logsRoutes = require("./routes/logsRoutes");
+const listasRoutes = require("./routes/listRaoutes");
 
 app.use("/games", gameRoutes);
 app.use("/", authRoutes);
 app.use("/logs", logsRoutes);
+app.use("/", listasRoutes);
 // En tu servidor Node.js
 app.post("/events", async (req, res) => {
     try {
@@ -103,6 +93,7 @@ app.post("/events", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 app.listen(3000, () => {
     console.log("Servidor escuchando en http://localhost:3000");
 });

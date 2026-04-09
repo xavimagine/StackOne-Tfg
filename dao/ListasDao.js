@@ -82,6 +82,28 @@ class ListasDAO {
             // ...
         }
     }
+    static async obtenerJuegosPorEstado(userId, status) {
+        const { data, error } = await supabase
+            .from("listas_games")
+            .select(
+                `
+            game_id,
+            status,
+            games (
+                id, id_game, name, cover, genres, 
+                rating, game_modes, company
+            )
+        `,
+            )
+            .eq("user_id", userId)
+            .eq("status", status);
+
+        if (error) throw error;
+        return data.map((item) => ({
+            ...item.games,
+            user_status: item.status,
+        }));
+    }
 }
 
 module.exports = ListasDAO;

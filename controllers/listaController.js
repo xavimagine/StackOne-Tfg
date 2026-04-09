@@ -96,6 +96,27 @@ class ListaController {
             return res.status(500).json({ ok: false, error: error.message });
         }
     }
+    static async obtenerPorEstado(req, res) {
+        try {
+            const user_id = req.session.usuario?.id;
+            const { status } = req.params;
+            if (!user_id) return res.status(401).json({ error: "Sin sesión" });
+            const games = await ListasDAO.obtenerJuegosPorEstado(
+                user_id,
+                status,
+            );
+            res.json({ ok: true, games });
+        } catch (error) {
+            console.error("ERROR obtenerPorEstado:", error);
+            res.status(500).json({ error: error.message });
+        }
+    }
 }
 
-module.exports = ListaController;
+module.exports = {
+    obtenerPorEstado: ListaController.obtenerPorEstado,
+    obtenerProgreso: ListaController.obtenerProgreso,
+    buscar: ListaController.toggle,
+    crear: ListaController.toggle,
+    toggle: ListaController.toggle,
+};
