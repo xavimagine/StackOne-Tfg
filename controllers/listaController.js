@@ -6,7 +6,6 @@ class ListaController {
             const user_id = req.session.usuario?.id;
             const { game_id, status } = req.body;
 
-            //  Validación de seguridad
             if (!user_id || !game_id || !status) {
                 return res
                     .status(400)
@@ -15,6 +14,10 @@ class ListaController {
 
             const statusLimpio = status.trim().toLowerCase();
             const gameIdNum = parseInt(game_id, 10);
+
+            if (!Number.isInteger(gameIdNum)) {
+                return res.status(400).json({ error: "game_id inválido" });
+            }
 
             const { data: existing, error: selectError } = await supabase
                 .from("listas_games")
@@ -26,38 +29,34 @@ class ListaController {
             if (selectError) throw selectError;
 
             if (existing) {
-                if (existing.status === statusLimpio) {
-                    const { error: deleteError } = await supabase
-                        .from("listas_games")
-                        .delete()
-                        .eq("id", existing.id);
-
-                    if (deleteError) throw deleteError;
-                    return res.json({ action: "removed" });
-                } else {
-                    const { error: updateError } = await supabase
-                        .from("listas_games")
-                        .update({ status: statusLimpio })
-                        .eq("id", existing.id);
-
-                    if (updateError) throw updateError;
-                    return res.json({
-                        action: "updated",
-                        newStatus: statusLimpio,
-                    });
-                }
-            } else {
-                const { error: insertError } = await supabase
+                const { error: deleteError } = await supabase
                     .from("listas_games")
-                    .insert({
-                        user_id: user_id,
-                        game_id: gameIdNum,
+                    .delete()
+                    .eq("id", existing.id);
+
+                if (deleteError) throw deleteError;
+
+                if (existing.status === statusLimpio) {
+                    return res.json({
+                        action: "removed",
                         status: statusLimpio,
                     });
-
-                if (insertError) throw insertError;
-                return res.json({ action: "added" });
+                }
             }
+
+            const { error: insertError } = await supabase
+                .from("listas_games")
+                .insert({
+                    user_id,
+                    game_id: gameIdNum,
+                    status: statusLimpio,
+                });
+
+            console.log("TOGGLE RECIBIDO", { user_id, game_id, status });
+
+            if (insertError) throw insertError;
+
+            return res.json({ action: "added", newStatus: statusLimpio });
         } catch (error) {
             console.error("Error detallado en toggle:", error);
             return res.status(500).json({ error: error.message });
@@ -105,6 +104,7 @@ class ListaController {
                 user_id,
                 status,
             );
+
             res.json({ ok: true, games });
         } catch (error) {
             console.error("ERROR obtenerPorEstado:", error);

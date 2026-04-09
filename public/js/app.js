@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnReset = document.getElementById("reset-filters");
     const btnSearch = document.getElementById("btn-search");
     const sectionDescubrir = document.getElementById("buscador");
-    const sectionPerfil = document.getElementById("perfil");
     const sectionEventos = document.getElementById("eventos-section");
     const navEventoMobile = document.getElementById("nav-eventos-mobile");
     const btnEventos = document.getElementById("nav-eventos");
@@ -107,6 +106,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = Object.fromEntries(formData.entries());
         if (data.usuario) {
             data.usuario = data.usuario.toLowerCase().trim();
+        }
+        if (data.email) {
+            data.email = data.email.toLowerCase().trim();
         }
         if (isRegister) {
             if (data.password !== data.confirmPassword) {
@@ -246,23 +248,32 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
+    function limpiarListasActivas() {
+        document.querySelectorAll("#listas-perfil a").forEach((b) => {
+            b.classList.remove("bg-gray-100", "dark:bg-gray-800");
+        });
+    }
     linkDescubrir.addEventListener("click", (e) => {
         e.preventDefault();
+        sectionEventos.classList.add("hidden");
         seccionBuscador.classList.remove("hidden");
         seccionPerfil.classList.add("hidden");
+        limpiarListasActivas();
     });
 
     descubirMobile.addEventListener("click", () => {
         seccionPerfil.classList.add("hidden");
         seccionBuscador.classList.remove("hidden");
+        limpiarListasActivas();
     });
 
     linkPerfil.addEventListener("click", (e) => {
         e.preventDefault();
+        sectionEventos.classList.add("hidden");
         if (isUserLoggedIn()) {
             seccionBuscador.classList.add("hidden");
             seccionPerfil.classList.remove("hidden");
+            limpiarListasActivas();
         } else {
             desplegarMenu.classList.remove("hidden");
         }
@@ -272,6 +283,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isUserLoggedIn()) {
             seccionBuscador.classList.add("hidden");
             seccionPerfil.classList.remove("hidden");
+            limpiarListasActivas();
         } else {
             desplegarMenu.classList.remove("hidden");
         }
@@ -291,7 +303,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 coverImage: game.cover,
                 coverAlt: game.name,
                 game_mode: game.game_modes,
-                game_id: game.id_game,
+                game_id: game.id,
                 userStatus: game.user_status,
             });
             container.appendChild(card);
@@ -383,14 +395,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 `http://localhost:3000/games/buscar?${params.toString()}`,
                 { credentials: "include" },
             );
-
             const resultado = await respuesta.json();
-
             if (!respuesta.ok)
                 throw new Error(
                     resultado.error || "Error al obtener los juegos",
                 );
-
             currentPage = resultado.pagination.currentPage;
             renderCards(resultado.games);
             renderPagination(resultado.pagination);
@@ -506,7 +515,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     const section = btn.closest("section");
                     const game_id = section.dataset.gameId;
                     const icon = btn.querySelector("span");
-
                     try {
                         const resp = await fetch(
                             "http://localhost:3000/games/lista",
@@ -528,17 +536,19 @@ document.addEventListener("DOMContentLoaded", () => {
                                 s.classList.add("text-white/40");
                             });
 
-                            if (result.action === "added") {
+                            if (
+                                result.action === "added" ||
+                                result.action === "updated"
+                            ) {
                                 icon.classList.remove("text-white/40");
                                 icon.classList.add(colorMap[status]);
                             }
 
-                            if (
-                                status === "acabado" ||
-                                status === "completado"
-                            ) {
+                            if (status === "acabado") {
                                 actualizarProgresoVisual();
                             }
+
+                            cargarListaActual();
                         }
                     } catch (err) {
                         console.error("Error al actualizar la lista:", err);
@@ -549,7 +559,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return card;
     }
-
+    async function cargarListaActual() {
+        const activeBtn = document.querySelector(
+            "#listas-perfil a.bg-gray-100, #listas-perfil a.dark\\:bg-gray-800",
+        );
+        if (!activeBtn) return;
+        activeBtn.click();
+    }
     btnSearch.addEventListener("click", applyFilters);
     searchInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") applyFilters();
@@ -566,14 +582,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     navEventoMobile.addEventListener("click", () => {
         sectionDescubrir.classList.add("hidden");
-        sectionPerfil.classList.add("hidden");
+        seccionPerfil.classList.add("hidden");
         sectionEventos.classList.remove("hidden");
         loadIGDBEvents();
     });
 
     btnEventos.addEventListener("click", () => {
         sectionDescubrir.classList.add("hidden");
-        sectionPerfil.classList.add("hidden");
+        seccionPerfil.classList.add("hidden");
         sectionEventos.classList.remove("hidden");
         loadIGDBEvents();
     });
@@ -668,7 +684,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         coverImage: game.cover,
                         coverAlt: game.name,
                         game_mode: game.game_modes,
-                        game_id: game.id_game,
+                        game_id: game.id,
                         userStatus: game.user_status,
                     });
                     grid.appendChild(card);
