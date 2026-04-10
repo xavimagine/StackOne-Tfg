@@ -1,6 +1,7 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const listController = require("../controllers/listaController");
+
+import listController from "../controllers/listaController.js";
 
 // Middleware de protección
 function soloLogueados(req, res, next) {
@@ -10,8 +11,9 @@ function soloLogueados(req, res, next) {
         res.status(401).json({ error: "No autorizado" });
     }
 }
+
 router.get("/games/lista/:status", listController.obtenerPorEstado);
 router.post("/buscar", soloLogueados, listController.buscar);
 router.post("/add", soloLogueados, listController.crear);
 
-module.exports = router;
+export default router;

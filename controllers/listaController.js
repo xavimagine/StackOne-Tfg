@@ -1,5 +1,5 @@
-const { supabase } = require("../db/database");
-const ListasDAO = require("../dao/listasDAO");
+import { supabase } from "../db/database.js";
+import ListasDAO from "../dao/listasDAO.js";
 class ListaController {
     static async toggle(req, res) {
         try {
@@ -110,8 +110,7 @@ class ListaController {
         }
     }
 }
-
-module.exports = {
+export default {
     obtenerPorEstado: ListaController.obtenerPorEstado,
     obtenerProgreso: ListaController.obtenerProgreso,
     buscar: ListaController.toggle,

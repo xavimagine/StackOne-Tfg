@@ -26,4 +26,4 @@ const registrarLog = async (req, res) => {
     }
 };
 
-module.exports = { registrarLog };
+export default { registrarLog };

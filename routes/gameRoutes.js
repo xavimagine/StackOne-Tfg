@@ -1,10 +1,13 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const gameController = require("../controllers/gameController");
-const ListaController = require("../controllers/listaController");
-// Todas las rutas protegidas
+
+import gameController from "../controllers/gameController.js";
+import ListaController from "../controllers/listaController.js";
+
 router.get("/buscar", gameController.buscarConPaginacion);
 router.get("/listar", gameController.listar);
 router.post("/lista", ListaController.toggle);
 router.get("/progreso", ListaController.obtenerProgreso);
-module.exports = router;
+
+// CAMBIO: module.exports -> export default
+export default router;

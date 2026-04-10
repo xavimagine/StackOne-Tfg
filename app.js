@@ -1,16 +1,27 @@
-const express = require("express");
-const cors = require("cors");
-const session = require("express-session");
+import express from "express";
+import cors from "cors";
+import session from "express-session";
+
+// NOTA: Asegúrate de que estos archivos terminen en .js y usen "export default"
+import gameRoutes from "./routes/gameRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import logsRoutes from "./routes/logsRoutes.js";
+import listasRoutes from "./routes/listRaoutes.js"; // Verifica si es "listRoutes.js" o "listRaoutes.js"
+
 const app = express();
+
+// Configuración de CORS
 app.use(
     cors({
-        origin: "http://localhost:5173",
+        origin: process.env.FRONTEND_URL || "http://localhost:5173",
         credentials: true,
     }),
 );
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Configuración de Session
 app.use(
     session({
         secret:
@@ -21,33 +32,24 @@ app.use(
         cookie: {
             maxAge: 3600000,
             secure: process.env.NODE_ENV === "production",
-            // Ayuda a prevenir ataques XSS
             httpOnly: true,
-            // Protege contra ataques CSRF
-            sameSite: "lax",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         },
     }),
 );
 
 app.use(express.static("public"));
 
-// juegos
-const gameRoutes = require("./routes/gameRoutes");
-
-//usuarios
-const authRoutes = require("./routes/authRoutes");
-// logs
-const logsRoutes = require("./routes/logsRoutes");
-const listasRoutes = require("./routes/listRaoutes");
-
+// Rutas
 app.use("/games", gameRoutes);
 app.use("/auth", authRoutes);
 app.use("/logs", logsRoutes);
 app.use("/", listasRoutes);
 
+// Endpoint de Eventos (IGDB + Twitch)
 app.post("/events", async (req, res) => {
     try {
-        // PASO 1: Obtener token
+        // PASO 1: Obtener token de Twitch
         const authResponse = await fetch(
             `https://id.twitch.tv/oauth2/token?client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&grant_type=client_credentials`,
             { method: "POST" },
@@ -63,8 +65,11 @@ app.post("/events", async (req, res) => {
 
         const accessToken = authData.access_token;
         const clientId = process.env.TWITCH_CLIENT_ID;
+
+        // Timestamp para el inicio de 2026
         const inicioAnio = Math.floor(new Date("2026-01-01").getTime() / 1000);
-        // PASO 3: Llamada a IGDB
+
+        // PASO 2: Llamada a IGDB
         const response = await fetch("https://api.igdb.com/v4/events", {
             method: "POST",
             headers: {
@@ -94,7 +99,10 @@ app.post("/events", async (req, res) => {
     }
 });
 
-app.listen(3000, () => {
-    console.log("Servidor escuchando en http://localhost:3000");
+// Inicio del servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
-module.exports = app;
+
+export default app;

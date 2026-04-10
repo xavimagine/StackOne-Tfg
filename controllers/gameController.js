@@ -1,5 +1,5 @@
-const GameDAO = require("../dao/GameDAO");
-
+import { supabase } from "../db/database.js";
+import GameDAO from "../dao/GameDAO.js";
 class GameController {
     static async listar(req, res) {
         try {
@@ -64,4 +64,4 @@ class GameController {
     }
 }
 
-module.exports = GameController;
+export default GameController;

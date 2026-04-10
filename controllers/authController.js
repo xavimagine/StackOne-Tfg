@@ -1,156 +1,186 @@
-import { jest } from "@jest/globals";
-import request from "supertest";
-import express from "express";
-import session from "express-session";
+import bcrypt from "bcrypt";
+import { supabase } from "../db/database.js";
+import UsuarioDAO from "../dao/UsuarioDAO.js";
+import LogDAO from "../dao/LogDAO.js";
 
-// --- MOCKS DE DEPENDENCIAS ---
-// Importante: Mockeamos los DAO y la Database antes de importar las rutas
-jest.unstable_mockModule("../db/database.js", () => ({
-    supabase: {
-        from: jest.fn().mockReturnThis(),
-        insert: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        delete: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-    },
-}));
+// --- Registro ---
+const registro = async (req, res) => {
+    try {
+        const { usuario, email, password } = req.body;
+        const avatar = `https://api.dicebear.com/9.x/micah/svg?seed=${usuario}`;
 
-jest.unstable_mockModule("../dao/UsuarioDAO.js", () => ({
-    default: {
-        buscarPorUsuario: jest.fn(),
-    },
-}));
-
-jest.unstable_mockModule("../dao/LogDAO.js", () => ({
-    default: {
-        insertar: jest.fn().mockResolvedValue(true),
-    },
-}));
-
-// Dinámicamente importamos después de los mocks
-const { default: authRouter } = await import("../routes/authRoutes.js");
-const { supabase } = await import("../db/database.js");
-const { default: UsuarioDAO } = await import("../dao/UsuarioDAO.js");
-
-// --- CONFIGURACIÓN APP DE PRUEBAS ---
-const app = express();
-app.use(express.json());
-app.use(
-    session({
-        secret: "test",
-        resave: false,
-        saveUninitialized: true,
-        cookie: { secure: false },
-    }),
-);
-app.use("/auth", authRouter);
-
-describe("Auth Controller Tests", () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-    });
-
-    describe("POST /auth/registro", () => {
-        test("Debe registrar usuario correctamente (Limpia <script> y hashea password)", async () => {
-            // Simulamos respuesta exitosa de Supabase
-            supabase
-                .from()
-                .insert()
-                .select.mockResolvedValue({
-                    data: [{ id: 1, nick: "Juan", email: "juan@test.com" }],
-                    error: null,
-                });
-
-            const res = await request(app).post("/auth/registro").send({
-                usuario: "Juan<script>",
-                email: "juan@test.com",
-                password: "password123",
+        // 1. VALIDACIÓN  con Regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            await LogDAO.insertar(
+                null,
+                "WARNING",
+                `Intento con email prohibido: "${usuario}" desde ${email}`,
+            );
+            return res.status(400).json({
+                ok: false,
+                mensaje: "El formato del correo no es válido",
             });
+        }
+        if (!usuario || usuario.trim() === "0" || usuario.trim().length < 3) {
+            await LogDAO.insertar(
+                null,
+                "WARNING",
+                `Intento con nick prohibido: "${usuario}" desde ${email}`,
+            );
 
-            expect(res.statusCode).toBe(201);
-            expect(res.body.mensaje).toBe("Cuenta creada");
-            // Verificamos que se limpió el nick antes de insertar
-            expect(supabase.from).toHaveBeenCalledWith("users");
-        });
-
-        test("Debe fallar si el nick tiene menos de 3 caracteres", async () => {
-            const res = await request(app).post("/auth/registro").send({
-                usuario: "Jo",
-                email: "test@test.com",
-                password: "password123",
+            return res.status(400).json({
+                ok: false,
+                mensaje:
+                    "El nick no puede ser '0' ni tener menos de 3 caracteres",
             });
+        }
+        // PROTECCIÓN CONTRA SCRIPTS
+        // Esto elimina etiquetas <script> o caracteres peligrosos
+        const emailLimpio = email.replace(/[<>]/g, "");
+        const usuarioLimpio = usuario.replace(/[<>]/g, "");
 
-            expect(res.statusCode).toBe(400);
-            expect(res.body.mensaje).toContain("menos de 3 caracteres");
-        });
+        const passwordHash = await bcrypt.hash(password, 10);
 
-        test("Debe fallar si el formato de email es inválido", async () => {
-            const res = await request(app).post("/auth/registro").send({
-                usuario: "UsuarioTest",
-                email: "email-falso",
-                password: "password123",
+        const { data, error } = await supabase
+            .from("users")
+            .insert([
+                {
+                    nick: usuarioLimpio,
+                    email: emailLimpio,
+                    password: passwordHash,
+                    avatar: avatar,
+                },
+            ])
+            .select();
+
+        if (error) {
+            return res.status(400).json({ ok: false, mensaje: error.message });
+        }
+        await LogDAO.insertar(
+            data[0].id,
+            "REGISTRO",
+            "Nuevo usuario creado con éxito",
+        );
+        return res.status(201).json({ ok: true, mensaje: "Cuenta creada" });
+    } catch (error) {
+        return res.status(500).json({ ok: false, mensaje: "Error interno" });
+    }
+};
+
+// --- Login ---
+const login = async (req, res) => {
+    const { usuario, password } = req.body;
+    try {
+        const user = await UsuarioDAO.buscarPorUsuario(usuario);
+
+        // Si no existe el usuario, enviamos 401 (Unauthorized)
+        if (!user) {
+            return res.status(401).json({
+                ok: false,
+                mensaje: "El usuario no existe",
             });
+        }
 
-            expect(res.statusCode).toBe(400);
-            expect(res.body.mensaje).toBe("El formato del correo no es válido");
-        });
-    });
+        const correcto = await bcrypt.compare(password, user.password);
 
-    describe("POST /auth/login", () => {
-        test("Debe iniciar sesión con credenciales correctas", async () => {
-            // 1. Mock de buscar usuario (simulando que existe)
-            // La password "password123" hasheada con bcrypt 10 rounds:
-            const hash =
-                "$2b$10$nS7pXpYqF4L7pYqF4L7pY.G9R.K8R.K8R.K8R.K8R.K8R.K8R.K8";
-
-            // Nota: Para simplificar el test de comparación de bcrypt,
-            // a veces es mejor mockear bcrypt, pero aquí simularemos el hallazgo del usuario
-            UsuarioDAO.buscarPorUsuario.mockResolvedValue({
-                id: 1,
-                nick: "Juan",
-                password: hash, // En un test real, este hash debe ser válido para bcrypt.compare
-                avatar: "url-avatar",
+        if (!correcto) {
+            return res.status(401).json({
+                ok: false,
+                mensaje: "La contraseña es incorrecta",
             });
+        }
 
-            // Forzamos el resultado de la comparación de bcrypt si es necesario
-            // o usamos una contraseña que sepamos que coincide.
+        req.session.usuario = {
+            id: user.id,
+            usuario: user.nick,
+        };
 
-            // Por simplicidad en este ejemplo, supongamos que UsuarioDAO devuelve los datos.
-            const res = await request(app)
-                .post("/auth/login")
-                .send({ usuario: "Juan", password: "password123" });
+        await LogDAO.insertar(
+            user.id,
+            "LOGIN",
+            `Inicio de sesión correcto - ID: ${user.id}`,
+        );
 
-            // Si bcrypt falla en el test por el hash manual, el resultado será 401.
-            // Para testear la lógica del controlador sin pelear con bcrypt:
-            expect(res.statusCode).toBeDefined();
+        res.json({
+            ok: true,
+            avatar: user.avatar,
+            nick: user.nick,
+            id: user.id,
         });
-
-        test("Debe fallar si el usuario no existe", async () => {
-            UsuarioDAO.buscarPorUsuario.mockResolvedValue(null);
-
-            const res = await request(app)
-                .post("/auth/login")
-                .send({ usuario: "Inexistente", password: "123" });
-
-            expect(res.statusCode).toBe(401);
-            expect(res.body.mensaje).toBe("El usuario no existe");
+    } catch (error) {
+        console.error("Error en login:", error);
+        res.status(500).json({
+            ok: false,
+            mensaje: "Error interno del servidor al intentar iniciar sesión",
         });
+    }
+};
+
+// --- Logout ---
+const logout = (req, res) => {
+    const userId = req.session.usuario?.id;
+    req.session.destroy(async (err) => {
+        if (err)
+            return res.status(500).json({ mensaje: "Error al cerrar sesión" });
+        if (userId) {
+            await LogDAO.insertar(
+                userId,
+                "LOGOUT",
+                `Cierre de sesión correcto - ID: ${userId}`,
+            );
+        }
+        res.json({ ok: true, mensaje: "Logout correcto" });
     });
+};
+//Eliminacion cuenta
+const deleteAccount = async (req, res) => {
+    try {
+        const userId = req.session.usuario?.id;
+        if (!userId) {
+            return res
+                .status(401)
+                .json({ ok: false, mensaje: "No hay usuario en sesión" });
+        }
 
-    describe("DELETE /auth/delete", () => {
-        test("Debe fallar si no hay sesión activa", async () => {
-            const res = await request(app).delete("/auth/delete");
-            expect(res.statusCode).toBe(401);
-            expect(res.body.mensaje).toBe("No hay usuario en sesión");
+        const { error: deleteError } = await supabase
+            .from("users")
+            .delete()
+            .eq("id", userId);
+
+        if (deleteError) {
+            return res
+                .status(500)
+                .json({ ok: false, mensaje: deleteError.message });
+        }
+
+        await LogDAO.insertar(
+            userId,
+            "INFO",
+            `Cuenta eliminada - ID: ${userId}`,
+        );
+
+        req.session.destroy((err) => {
+            if (err) {
+                console.error("Error sesión:", err);
+            }
+            res.clearCookie("connect.sid");
+            res.json({
+                ok: true,
+                mensaje: "Cuenta eliminada correctamente",
+            });
         });
+        return;
+    } catch (error) {
+        console.error("Error deleteAccount:", error);
+        res.status(500).json({ ok: false, mensaje: error.message });
+    }
+};
+const authController = {
+    registro,
+    login,
+    logout,
+    deleteAccount,
+};
 
-        test("Debe borrar cuenta si hay sesión", async () => {
-            // Simulamos una sesión activa inyectando el middleware de login antes o mockeando el objeto session
-            // En Supertest, esto es más complejo, pero puedes probar la lógica de Supabase:
-            supabase.from().delete().eq.mockResolvedValue({ error: null });
-
-            // Para este test específico, la ruta requiere estar logueado.
-            // En un entorno de integración, primero harías login y luego deleteAccount.
-        });
-    });
-});
+export default authController;

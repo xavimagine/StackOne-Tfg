@@ -1,5 +1,4 @@
-const { supabase } = require("../db/database");
-
+import { supabase } from "../db/database.js";
 class ListasDAO {
     static async obtenerConteoPorEstado(userId) {
         try {
@@ -106,4 +105,4 @@ class ListasDAO {
     }
 }
 
-module.exports = ListasDAO;
+export default ListasDAO;

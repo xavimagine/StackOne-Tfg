@@ -1,13 +1,16 @@
-require("dotenv").config({
-    path: require("path").resolve(__dirname, "../.env"),
-});
-// const { Pool } = require("pg");
-const { createClient } = require("@supabase/supabase-js"); // Cliente Supabase
+import { createClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname, resolve } from "path";
 
-// 2. Configuración Supabase
-const supabase = createClient(
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+dotenv.config({
+    path: resolve(__dirname, "../.env"),
+});
+
+export const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_KEY,
 );
-
-module.exports = { supabase };

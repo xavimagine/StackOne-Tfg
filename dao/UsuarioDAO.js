@@ -1,5 +1,4 @@
-const { supabase } = require("../db/database");
-
+import { supabase } from "../db/database.js";
 class UsuarioDAO {
     static async crear(usuario, passwordHash, email) {
         // Generamos el avatar dinámico
@@ -43,4 +42,4 @@ class UsuarioDAO {
     }
 }
 
-module.exports = UsuarioDAO;
+export default UsuarioDAO;

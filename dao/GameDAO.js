@@ -1,5 +1,4 @@
-const { supabase } = require("../db/database");
-
+import { supabase } from "../db/database.js";
 class GameDAO {
     static async listar(page = 1, limit = 10) {
         const offset = (page - 1) * limit;
@@ -101,4 +100,4 @@ class GameDAO {
     }
 }
 
-module.exports = GameDAO;
+export default GameDAO;

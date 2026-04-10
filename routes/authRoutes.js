@@ -1,6 +1,7 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const authController = require("../controllers/authController");
+
+import authController from "../controllers/authController.js";
 
 const isAuthenticated = (req, res, next) => {
     if (req.session.usuario) return next();
@@ -15,6 +16,8 @@ router.post("/login", authController.login);
 
 // Logout
 router.post("/logout", isAuthenticated, authController.logout);
-//Eliminar cuenta
+
+// Eliminar cuenta
 router.delete("/delete", isAuthenticated, authController.deleteAccount);
-module.exports = router;
+
+export default router;

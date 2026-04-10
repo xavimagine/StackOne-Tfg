@@ -1,11 +1,25 @@
 [build]
-  # Directorio donde está tu index.html
   publish = "public"
+  command = "npm install"  # Instala dependencias functions
 
-  # Si en el futuro usas un comando de build (como npm run build)
-  # command = "npm run build"
+[functions]
+  directory = "netlify/functions"  # ← IMPORTANTE
 
 [[redirects]]
+  # API Routes → Netlify Functions
+  from = "/api/*"
+  to = "/.netlify/functions/api/server/:splat"
+  status = 200
+  force = true
+
+[[redirects]]  
+  from = "/auth/*"
+  to = "/.netlify/functions/api/server/auth/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  # Frontend SPA routing
   from = "/*"
   to = "/index.html"
   status = 200
