@@ -37,6 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const sectionEventos = document.getElementById("eventos-section");
     const navEventoMobile = document.getElementById("nav-eventos-mobile");
     const btnEventos = document.getElementById("nav-eventos");
+    const iconostack = document.getElementById("iconostack");
+    const lemastack = document.getElementById("lemastack");
 
     function isUserLoggedIn() {
         return !document
@@ -66,6 +68,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (mobileMenuBtn && mobileMenu) {
         mobileMenuBtn.addEventListener("click", () => {
             mobileMenu.classList.toggle("hidden");
+        });
+
+        mobileMenu.addEventListener("mouseleave", () => {
+            mobileMenu.classList.add("hidden");
         });
     }
 
@@ -131,11 +137,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
                 return;
             }
-            enviarPeticion("http://localhost:3000/registro", data);
+            enviarPeticion("http://localhost:3000/auth/registro", data);
         } else {
             delete data.confirmPassword;
             delete data.email;
-            enviarPeticion("http://localhost:3000/login", data);
+            enviarPeticion("http://localhost:3000/auth/login", data);
         }
     });
     // Volver atras en detalles de juego
@@ -175,13 +181,13 @@ document.addEventListener("DOMContentLoaded", () => {
             />
 
             <div class="space-y-4 text-black">
-                <h2 class="text-4xl font-bold">${game.name}</h2>
-                <p class="text-black/80">${game.summary || "Sin descripción disponible."}</p>
-                <div><strong>Géneros:</strong> ${game.genres || "-"}</div>
-                <div><strong>Plataformas:</strong> ${game.platforms || "-"}</div>
-                <div><strong>Rating:</strong> ${game.rating ?? "N/A"}</div>
-                <div><strong>Compañía:</strong> ${game.company || "-"}</div>
-                <div><strong>Modos:</strong> ${game.game_modes || "-"}</div>
+                <h2 class="text-4xl font-bold dark:text-white">${game.name}</h2>
+                <p class="text-black/80 dark:text-white">${game.summary || "Sin descripción disponible."}</p>
+                <div class="dark:text-white"><strong>Géneros:</strong> ${game.genres || "-"}</div>
+                <div class="dark:text-white"><strong>Plataformas:</strong> ${game.platforms || "-"}</div>
+                <div class="dark:text-white"><strong>Rating:</strong> ${game.rating ?? "N/A"}</div>
+                <div class="dark:text-white"><strong>Compañía:</strong> ${game.company || "-"}</div>
+                <div class="dark:text-white"><strong>Modos:</strong> ${game.game_modes || "-"}</div>
             </div>
         </div>
     `;
@@ -285,10 +291,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (logoutBtn) {
         logoutBtn.addEventListener("click", async () => {
             try {
-                const respuesta = await fetch("http://localhost:3000/logout", {
-                    method: "POST",
-                    credentials: "include",
-                });
+                const respuesta = await fetch(
+                    "http://localhost:3000/auth/logout",
+                    {
+                        method: "POST",
+                        credentials: "include",
+                    },
+                );
                 const resultado = await respuesta.json();
                 if (respuesta.ok && resultado.ok) {
                     document.getElementById("perfil").classList.add("hidden");
@@ -314,6 +323,21 @@ document.addEventListener("DOMContentLoaded", () => {
             b.classList.remove("bg-gray-100", "dark:bg-gray-800");
         });
     }
+    iconostack.addEventListener("click", (e) => {
+        e.preventDefault();
+        sectionEventos.classList.add("hidden");
+        seccionBuscador.classList.remove("hidden");
+        seccionPerfil.classList.add("hidden");
+        limpiarListasActivas();
+    });
+    lemastack.addEventListener("click", (e) => {
+        e.preventDefault();
+        sectionEventos.classList.add("hidden");
+        seccionBuscador.classList.remove("hidden");
+        seccionPerfil.classList.add("hidden");
+        limpiarListasActivas();
+    });
+
     linkDescubrir.addEventListener("click", (e) => {
         e.preventDefault();
         sectionEventos.classList.add("hidden");
@@ -331,6 +355,7 @@ document.addEventListener("DOMContentLoaded", () => {
     linkPerfil.addEventListener("click", (e) => {
         e.preventDefault();
         sectionEventos.classList.add("hidden");
+        sectionEventos.classList.add("hidden");
         if (isUserLoggedIn()) {
             seccionBuscador.classList.add("hidden");
             seccionPerfil.classList.remove("hidden");
@@ -341,6 +366,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     linkPerfilMobile.addEventListener("click", () => {
+        document.getElementById("game-detail").classList.add("hidden"); // añade esto
         if (isUserLoggedIn()) {
             seccionBuscador.classList.add("hidden");
             seccionPerfil.classList.remove("hidden");
@@ -389,13 +415,68 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    function mostrarDetalleEvento(event) {
+        const date = new Date(event.start_time * 1000).toLocaleDateString(
+            "es-ES",
+            {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+            },
+        );
+        const imgUrl = event.event_logo?.url
+            ? `https:${event.event_logo.url.replace("t_thumb", "t_720p")}`
+            : "assets/default/default-event-image.png";
+
+        const detail = document.getElementById("game-detail");
+        detail.innerHTML = `
+        <button id="back-btn" class="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700">
+            ← Volver
+        </button>
+
+        <div class="grid md:grid-cols-2 gap-8 items-start">
+            <img
+                src="${imgUrl}"
+                alt="${event.name}"
+                class="w-full rounded-2xl shadow-xl object-cover"
+            />
+
+            <div class="space-y-4 text-black">
+                <h2 class="text-4xl font-bold dark:text-white">${event.name}</h2>
+                <p class="text-black/80 dark:text-white">${event.description || "Sin descripción disponible."}</p>
+                <div class="dark:text-white"><strong>Fecha:</strong> ${date}</div>
+                ${
+                    event.live_stream_url
+                        ? `
+                <a href="${event.live_stream_url}" target="_blank"
+                    class="inline-block mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90">
+                    Ver en directo
+                </a>`
+                        : ""
+                }
+            </div>
+        </div>
+    `;
+
+        document.getElementById("back-btn").addEventListener("click", () => {
+            detail.classList.add("hidden");
+            document
+                .getElementById("eventos-section")
+                .classList.remove("hidden");
+            loadIGDBEvents();
+        });
+
+        document.getElementById("eventos-section").classList.add("hidden");
+        detail.classList.remove("hidden");
+    }
+
     function renderPagination({ currentPage, totalPages }) {
         let pagination = document.getElementById("pagination");
         if (!pagination) {
             pagination = document.createElement("div");
             pagination.id = "pagination";
             pagination.className =
-                "flex items-center justify-center gap-2 mt-6 flex-wrap";
+                "flex items-center justify-center gap-2 mt-6 mb-8 flex-wrap";
             document
                 .getElementById("resultados")
                 .insertAdjacentElement("afterend", pagination);
@@ -494,10 +575,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    function limpiarTextoBusqueda(texto) {
+        return texto.trim().replace(/[<>]/g, "").slice(0, 220);
+    }
     function applyFilters() {
         const DEFAULTS = ["Genero", "Platform", "Rating", ""];
         activeFilters = {
-            texto: searchInput.value,
+            texto: limpiarTextoBusqueda(searchInput.value),
             genero: DEFAULTS.includes(filterGenre.value)
                 ? ""
                 : filterGenre.value,
@@ -695,17 +779,21 @@ document.addEventListener("DOMContentLoaded", () => {
             const imgUrl = event.event_logo?.url
                 ? `https:${event.event_logo.url.replace("t_thumb", "t_cover_big")}`
                 : "assets/default/default-event-image.png";
-            container.innerHTML += `
-                <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 transition-transform hover:scale-[1.02]">
-                    <img src="${imgUrl}" class="w-full h-48 object-cover" alt="${event.name}">
-                    <div class="p-6">
-                        <span class="text-xs font-bold text-primary uppercase tracking-wider">${date}</span>
-                        <h3 class="text-xl font-bold mt-2 text-gray-900 dark:text-white">${event.name}</h3>
-                        <p class="text-gray-600 dark:text-gray-400 mt-3 text-sm line-clamp-3">
-                            ${event.description || "No hay detalles adicionales para este evento."}
-                        </p>
-                    </div>
-                </div>`;
+
+            const card = document.createElement("div");
+            card.className =
+                "bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 transition-transform hover:scale-[1.02] cursor-pointer";
+            card.innerHTML = `
+            <img src="${imgUrl}" class="w-full h-48 object-cover" alt="${event.name}">
+            <div class="p-6">
+                <span class="text-xs font-bold text-primary uppercase tracking-wider">${date}</span>
+                <h3 class="text-xl font-bold mt-2 text-gray-900 dark:text-white">${event.name}</h3>
+                <p class="text-gray-600 dark:text-gray-400 mt-3 text-sm line-clamp-3">
+                    ${event.description || "No hay detalles adicionales para este evento."}
+                </p>
+            </div>`;
+            card.addEventListener("click", () => mostrarDetalleEvento(event));
+            container.appendChild(card);
         });
     }
 
@@ -832,5 +920,49 @@ async function actualizarProgresoVisual() {
         }
     } catch (err) {
         console.error("Error al actualizar la barra:", err);
+    }
+}
+
+document
+    .getElementById("delete-Acount")
+    .addEventListener("click", eliminarCuenta);
+async function eliminarCuenta() {
+    const result = await Swal.fire({
+        title: "¿Estás seguro?",
+        text: "Esta acción eliminará tu cuenta PERMANENTEMENTE y no podrás recuperarla.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#ef4444",
+        cancelButtonColor: "#6b7280",
+        confirmButtonText: "Sí, eliminar mi cuenta",
+        cancelButtonText: "Cancelar",
+        reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) {
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:3000/auth/delete", {
+            method: "DELETE",
+            credentials: "include",
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`Error ${response.status}: ${errorText}`);
+            await Swal.fire("Error", "No se pudo eliminar la cuenta", "error");
+            return;
+        }
+
+        const data = await response.json();
+        await Swal.fire("¡Eliminada!", data.mensaje, "success");
+
+        sessionStorage.clear();
+        window.location.href = "index.html";
+    } catch (error) {
+        console.error("Error en fetch:", error);
+        await Swal.fire("Error", "Error de conexión", "error");
     }
 }

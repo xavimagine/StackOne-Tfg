@@ -41,10 +41,10 @@ const logsRoutes = require("./routes/logsRoutes");
 const listasRoutes = require("./routes/listRaoutes");
 
 app.use("/games", gameRoutes);
-app.use("/", authRoutes);
+app.use("/auth", authRoutes);
 app.use("/logs", logsRoutes);
 app.use("/", listasRoutes);
-// En tu servidor Node.js
+
 app.post("/events", async (req, res) => {
     try {
         // PASO 1: Obtener token

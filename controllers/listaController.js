@@ -52,8 +52,6 @@ class ListaController {
                     status: statusLimpio,
                 });
 
-            console.log("TOGGLE RECIBIDO", { user_id, game_id, status });
-
             if (insertError) throw insertError;
 
             return res.json({ action: "added", newStatus: statusLimpio });

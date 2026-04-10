@@ -74,25 +74,34 @@ export const login = async (req, res) => {
     try {
         const user = await UsuarioDAO.buscarPorUsuario(usuario);
 
+        // Si no existe el usuario, enviamos 401 (Unauthorized)
         if (!user) {
-            return res.json({ ok: false, mensaje: "Usuario no encontrado" });
+            return res.status(401).json({
+                ok: false,
+                mensaje: "El usuario no existe",
+            });
         }
 
         const correcto = await bcrypt.compare(password, user.password);
 
         if (!correcto) {
-            return res.json({ ok: false, mensaje: "Contraseña incorrecta" });
+            return res.status(401).json({
+                ok: false,
+                mensaje: "La contraseña es incorrecta",
+            });
         }
 
         req.session.usuario = {
             id: user.id,
             usuario: user.nick,
         };
+
         await LogDAO.insertar(
             user.id,
             "LOGIN",
             `Inicio de sesión correcto - ID: ${user.id}`,
         );
+
         res.json({
             ok: true,
             avatar: user.avatar,
@@ -100,7 +109,11 @@ export const login = async (req, res) => {
             id: user.id,
         });
     } catch (error) {
-        res.status(500).json({ error: "Error en login" });
+        console.error("Error en login:", error);
+        res.status(500).json({
+            ok: false,
+            mensaje: "Error interno del servidor al intentar iniciar sesión",
+        });
     }
 };
 
@@ -119,4 +132,47 @@ export const logout = (req, res) => {
         }
         res.json({ ok: true, mensaje: "Logout correcto" });
     });
+};
+//Eliminacion cuenta
+export const deleteAccount = async (req, res) => {
+    try {
+        const userId = req.session.usuario?.id;
+        if (!userId) {
+            return res
+                .status(401)
+                .json({ ok: false, mensaje: "No hay usuario en sesión" });
+        }
+
+        const { error: deleteError } = await supabase
+            .from("users")
+            .delete()
+            .eq("id", userId);
+
+        if (deleteError) {
+            return res
+                .status(500)
+                .json({ ok: false, mensaje: deleteError.message });
+        }
+
+        await LogDAO.insertar(
+            userId,
+            "INFO",
+            `Cuenta eliminada - ID: ${userId}`,
+        );
+
+        req.session.destroy((err) => {
+            if (err) {
+                console.error("Error sesión:", err);
+            }
+            res.clearCookie("connect.sid");
+            res.json({
+                ok: true,
+                mensaje: "Cuenta eliminada correctamente",
+            });
+        });
+        return;
+    } catch (error) {
+        console.error("Error deleteAccount:", error);
+        res.status(500).json({ ok: false, mensaje: error.message });
+    }
 };
