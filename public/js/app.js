@@ -1,6 +1,6 @@
 const API_BASE =
-    window.location.hostname === "localhost" ? "http://localhost:3000" : "/api";
-
+    window.location.hostname === "localhost" ? "${API_URL}" : "/api";
+const API_URL = process.env.FRONTEND_URL;
 document.addEventListener("DOMContentLoaded", () => {
     const ITEMS_PER_PAGE = 20;
     let currentPage = 1;
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function registrarLog(tipo, mensaje) {
         try {
-            await fetch("http://localhost:3000/logs", {
+            await fetch("${API_URL}/logs", {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -141,11 +141,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
                 return;
             }
-            enviarPeticion("http://localhost:3000/auth/registro", data);
+            enviarPeticion("${API_URL}/auth/registro", data);
         } else {
             delete data.confirmPassword;
             delete data.email;
-            enviarPeticion("http://localhost:3000/auth/login", data);
+            enviarPeticion("${API_URL}/auth/login", data);
         }
     });
     // Volver atras en detalles de juego
@@ -295,13 +295,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (logoutBtn) {
         logoutBtn.addEventListener("click", async () => {
             try {
-                const respuesta = await fetch(
-                    "http://localhost:3000/auth/logout",
-                    {
-                        method: "POST",
-                        credentials: "include",
-                    },
-                );
+                const respuesta = await fetch("${API_URL}/auth/logout", {
+                    method: "POST",
+                    credentials: "include",
+                });
                 const resultado = await respuesta.json();
                 if (respuesta.ok && resultado.ok) {
                     document.getElementById("perfil").classList.add("hidden");
@@ -556,7 +553,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (filters.rating !== null) params.set("rating", filters.rating);
 
             const respuesta = await fetch(
-                `http://localhost:3000/games/buscar?${params.toString()}`,
+                `${API_URL}/games/buscar?${params.toString()}`,
                 { credentials: "include" },
             );
             const resultado = await respuesta.json();
@@ -683,15 +680,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     const game_id = section.dataset.gameId;
                     const icon = btn.querySelector("span");
                     try {
-                        const resp = await fetch(
-                            "http://localhost:3000/games/lista",
-                            {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                credentials: "include",
-                                body: JSON.stringify({ game_id, status }),
-                            },
-                        );
+                        const resp = await fetch("${API_URL}/games/lista", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            credentials: "include",
+                            body: JSON.stringify({ game_id, status }),
+                        });
 
                         const result = await resp.json();
 
@@ -764,7 +758,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadIGDBEvents() {
         const container = document.getElementById("eventos-container");
         try {
-            const respuesta = await fetch("http://localhost:3000/events", {
+            const respuesta = await fetch("${API_URL}/events", {
                 method: "POST",
                 credentials: "include",
             });
@@ -830,12 +824,9 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
             try {
-                const resp = await fetch(
-                    `http://localhost:3000/games/lista/${status}`,
-                    {
-                        credentials: "include",
-                    },
-                );
+                const resp = await fetch(`${API_URL}/games/lista/${status}`, {
+                    credentials: "include",
+                });
 
                 const result = await resp.json();
                 listasGamesContainer.innerHTML = "";
@@ -898,13 +889,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function actualizarProgresoVisual() {
     try {
-        const res = await fetch(
-            `http://localhost:3000/games/progreso?t=${Date.now()}`,
-            {
-                method: "GET",
-                credentials: "include",
-            },
-        );
+        const res = await fetch(`${API_URL}/games/progreso?t=${Date.now()}`, {
+            method: "GET",
+            credentials: "include",
+        });
 
         if (res.status === 401)
             return console.warn("Inicia sesión para ver progreso");
@@ -948,7 +936,7 @@ async function eliminarCuenta() {
     }
 
     try {
-        const response = await fetch("http://localhost:3000/auth/delete", {
+        const response = await fetch("${API_URL}/auth/delete", {
             method: "DELETE",
             credentials: "include",
         });
