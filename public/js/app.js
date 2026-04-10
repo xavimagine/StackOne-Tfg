@@ -1,3 +1,6 @@
+const API_BASE =
+    window.location.hostname === "localhost" ? "http://localhost:3000" : "/api";
+
 document.addEventListener("DOMContentLoaded", () => {
     const ITEMS_PER_PAGE = 20;
     let currentPage = 1;
