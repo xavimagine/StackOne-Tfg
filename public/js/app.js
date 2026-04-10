@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             await fetch("http://localhost:3000/logs", {
                 method: "POST",
+                credentials: "include",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ tipo, mensaje }),
             });
