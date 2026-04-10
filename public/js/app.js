@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function registrarLog(tipo, mensaje) {
         try {
-            await fetch("${API_URL}/logs", {
+            await fetch(`${API_URL}/logs`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -143,11 +143,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
                 return;
             }
-            enviarPeticion("${API_URL}/auth/registro", data);
+            enviarPeticion(`${API_URL}/auth/registro`, data);
         } else {
             delete data.confirmPassword;
             delete data.email;
-            enviarPeticion("${API_URL}/auth/login", data);
+            enviarPeticion(`${API_URL}/auth/login`, data);
         }
     });
     // Volver atras en detalles de juego
@@ -297,7 +297,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (logoutBtn) {
         logoutBtn.addEventListener("click", async () => {
             try {
-                const respuesta = await fetch("${API_URL}/auth/logout", {
+                const respuesta = await fetch(`${API_URL}/auth/logout`, {
                     method: "POST",
                     credentials: "include",
                 });
@@ -682,7 +682,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const game_id = section.dataset.gameId;
                     const icon = btn.querySelector("span");
                     try {
-                        const resp = await fetch("${API_URL}/games/lista", {
+                        const resp = await fetch(`${API_URL}/games/lista`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             credentials: "include",
@@ -760,7 +760,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadIGDBEvents() {
         const container = document.getElementById("eventos-container");
         try {
-            const respuesta = await fetch("${API_URL}/events", {
+            const respuesta = await fetch(`${API_URL}/events`, {
                 method: "POST",
                 credentials: "include",
             });
@@ -938,7 +938,7 @@ async function eliminarCuenta() {
     }
 
     try {
-        const response = await fetch("${API_URL}/auth/delete", {
+        const response = await fetch(`${API_URL}/auth/delete`, {
             method: "DELETE",
             credentials: "include",
         });
