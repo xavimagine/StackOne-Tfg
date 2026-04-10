@@ -1,6 +1,8 @@
-const API_BASE =
-    window.location.hostname === "localhost" ? "${API_URL}" : "/api";
-const API_URL = process.env.FRONTEND_URL;
+const API_URL =
+    window.location.hostname === "localhost"
+        ? "http://localhost:3000"
+        : "https://stackone-play.netlify.app";
+
 document.addEventListener("DOMContentLoaded", () => {
     const ITEMS_PER_PAGE = 20;
     let currentPage = 1;
