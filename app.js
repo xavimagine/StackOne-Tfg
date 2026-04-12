@@ -9,7 +9,7 @@ import listasRoutes from "./routes/listRaoutes.js";
 
 const app = express();
 
-// ✅ CORS MIDDLEWARE CORREGIDO (PRIMERO)
+// CORS MIDDLEWARE
 app.use((req, res, next) => {
     const allowedOrigins = [
         "http://localhost:3000",
@@ -41,7 +41,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// ✅ MIDDLEWARES
+// MIDDLEWARES
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -63,7 +63,7 @@ app.use(
 
 app.use(express.static("public"));
 
-// ✅ RUTAS
+//  RUTAS
 app.use("/games", gameRoutes);
 app.use("/auth", authRoutes);
 app.use("/logs", logsRoutes);

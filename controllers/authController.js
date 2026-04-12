@@ -1,6 +1,4 @@
-import bcrypt from "bcrypt";
 import { supabase } from "../db/database.js";
-import UsuarioDAO from "../dao/UsuarioDAO.js";
 import LogDAO from "../dao/LogDAO.js";
 
 // --- Registro ---
@@ -9,46 +7,45 @@ const registro = async (req, res) => {
         const { usuario, email, password } = req.body;
         const avatar = `https://api.dicebear.com/9.x/micah/svg?seed=${usuario}`;
 
-        // 1. VALIDACIÓN  con Regex
+        // Validaciones
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            await LogDAO.insertar(
-                null,
-                "WARNING",
-                `Intento con email prohibido: "${usuario}" desde ${email}`,
-            );
             return res.status(400).json({
                 ok: false,
                 mensaje: "El formato del correo no es válido",
             });
         }
-        if (!usuario || usuario.trim() === "0" || usuario.trim().length < 3) {
-            await LogDAO.insertar(
-                null,
-                "WARNING",
-                `Intento con nick prohibido: "${usuario}" desde ${email}`,
-            );
-
+        if (!usuario || usuario.trim().length < 3) {
             return res.status(400).json({
                 ok: false,
-                mensaje:
-                    "El nick no puede ser '0' ni tener menos de 3 caracteres",
+                mensaje: "El nick debe tener al menos 3 caracteres",
             });
         }
-        // PROTECCIÓN CONTRA SCRIPTS
-        // Esto elimina etiquetas <script> o caracteres peligrosos
+
         const emailLimpio = email.replace(/[<>]/g, "");
         const usuarioLimpio = usuario.replace(/[<>]/g, "");
 
-        const passwordHash = await bcrypt.hash(password, 10);
+        // 1. Crear usuario en Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signUp(
+            {
+                email: emailLimpio,
+                password: password,
+            },
+        );
 
+        if (authError) {
+            return res
+                .status(400)
+                .json({ ok: false, mensaje: authError.message });
+        }
+
+        // 2. Guardar nick y avatar en tu tabla users
         const { data, error } = await supabase
             .from("users")
             .insert([
                 {
                     nick: usuarioLimpio,
                     email: emailLimpio,
-                    password: passwordHash,
                     avatar: avatar,
                 },
             ])
@@ -57,6 +54,7 @@ const registro = async (req, res) => {
         if (error) {
             return res.status(400).json({ ok: false, mensaje: error.message });
         }
+
         await LogDAO.insertar(
             data[0].id,
             "REGISTRO",
@@ -72,47 +70,54 @@ const registro = async (req, res) => {
 const login = async (req, res) => {
     const { usuario, password } = req.body;
     try {
-        const user = await UsuarioDAO.buscarPorUsuario(usuario);
+        // 1. Buscar email por nick en tu tabla
+        const { data: userData, error: userError } = await supabase
+            .from("users")
+            .select("id, nick, email, avatar")
+            .eq("nick", usuario)
+            .single();
 
-        // Si no existe el usuario, enviamos 401 (Unauthorized)
-        if (!user) {
-            return res.status(401).json({
-                ok: false,
-                mensaje: "El usuario no existe",
-            });
+        if (userError || !userData) {
+            return res
+                .status(401)
+                .json({ ok: false, mensaje: "El usuario no existe" });
         }
 
-        const correcto = await bcrypt.compare(password, user.password);
-
-        if (!correcto) {
-            return res.status(401).json({
-                ok: false,
-                mensaje: "La contraseña es incorrecta",
+        // 2. Verificar contraseña con Supabase Auth
+        const { data: authData, error: authError } =
+            await supabase.auth.signInWithPassword({
+                email: userData.email,
+                password: password,
             });
+
+        if (authError) {
+            return res
+                .status(401)
+                .json({ ok: false, mensaje: "La contraseña es incorrecta" });
         }
 
+        // 3. Crear sesión igual que antes
         req.session.usuario = {
-            id: user.id,
-            usuario: user.nick,
+            id: userData.id,
+            usuario: userData.nick,
         };
 
         await LogDAO.insertar(
-            user.id,
+            userData.id,
             "LOGIN",
-            `Inicio de sesión correcto - ID: ${user.id}`,
+            `Inicio de sesión correcto - ID: ${userData.id}`,
         );
 
         res.json({
             ok: true,
-            avatar: user.avatar,
-            nick: user.nick,
-            id: user.id,
+            avatar: userData.avatar,
+            nick: userData.nick,
+            id: userData.id,
         });
     } catch (error) {
-        console.error("Error en login:", error);
         res.status(500).json({
             ok: false,
-            mensaje: "Error interno del servidor al intentar iniciar sesión",
+            mensaje: "Error interno del servidor",
         });
     }
 };
@@ -133,7 +138,8 @@ const logout = (req, res) => {
         res.json({ ok: true, mensaje: "Logout correcto" });
     });
 };
-//Eliminacion cuenta
+
+// --- Eliminar cuenta ---
 const deleteAccount = async (req, res) => {
     try {
         const userId = req.session.usuario?.id;
@@ -143,6 +149,14 @@ const deleteAccount = async (req, res) => {
                 .json({ ok: false, mensaje: "No hay usuario en sesión" });
         }
 
+        // 1. Obtener email para borrar de Supabase Auth
+        const { data: userData } = await supabase
+            .from("users")
+            .select("email")
+            .eq("id", userId)
+            .single();
+
+        // 2. Borrar de tu tabla users
         const { error: deleteError } = await supabase
             .from("users")
             .delete()
@@ -154,6 +168,17 @@ const deleteAccount = async (req, res) => {
                 .json({ ok: false, mensaje: deleteError.message });
         }
 
+        // 3. Borrar de Supabase Auth
+        if (userData?.email) {
+            const { data: authUser } = await supabase.auth.admin.listUsers();
+            const user = authUser?.users?.find(
+                (u) => u.email === userData.email,
+            );
+            if (user) {
+                await supabase.auth.admin.deleteUser(user.id);
+            }
+        }
+
         await LogDAO.insertar(
             userId,
             "INFO",
@@ -161,26 +186,13 @@ const deleteAccount = async (req, res) => {
         );
 
         req.session.destroy((err) => {
-            if (err) {
-                console.error("Error sesión:", err);
-            }
             res.clearCookie("connect.sid");
-            res.json({
-                ok: true,
-                mensaje: "Cuenta eliminada correctamente",
-            });
+            res.json({ ok: true, mensaje: "Cuenta eliminada correctamente" });
         });
-        return;
     } catch (error) {
-        console.error("Error deleteAccount:", error);
         res.status(500).json({ ok: false, mensaje: error.message });
     }
 };
-const authController = {
-    registro,
-    login,
-    logout,
-    deleteAccount,
-};
 
+const authController = { registro, login, logout, deleteAccount };
 export default authController;

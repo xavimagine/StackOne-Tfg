@@ -1,17 +1,21 @@
-const ListaController = require("../controllers/listaController");
-const { supabase } = require("../db/database");
+import { jest } from "@jest/globals";
 
-// El secreto es mockReturnThis() en 'eq' para permitir el encadenamiento .eq().eq()
-jest.mock("../db/database", () => ({
-    supabase: {
-        from: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        delete: jest.fn().mockReturnThis(),
-        maybeSingle: jest.fn(),
-        insert: jest.fn().mockResolvedValue({ error: null }),
-    },
+const mockSupabase = {
+    from: jest.fn().mockReturnThis(),
+    select: jest.fn().mockReturnThis(),
+    eq: jest.fn().mockReturnThis(),
+    delete: jest.fn().mockReturnThis(),
+    maybeSingle: jest.fn(),
+    insert: jest.fn().mockResolvedValue({ error: null }),
+};
+
+jest.unstable_mockModule("../db/database.js", () => ({
+    supabase: mockSupabase,
+    supabaseAdmin: {},
 }));
+
+const { default: ListaController } =
+    await import("../controllers/listaController.js");
 
 const mockRes = () => {
     const res = {};
@@ -29,16 +33,10 @@ describe("ListaController", () => {
             session: { usuario: { id: 1 } },
         };
         const res = mockRes();
-
-        // Simulamos que no existe previo para que intente insertar
-        supabase.maybeSingle.mockResolvedValue({ data: null, error: null });
-
+        mockSupabase.maybeSingle.mockResolvedValue({ data: null, error: null });
         await ListaController.toggle(req, res);
-
         expect(res.json).toHaveBeenCalledWith(
-            expect.objectContaining({
-                action: "added",
-            }),
+            expect.objectContaining({ action: "added" }),
         );
     });
 });

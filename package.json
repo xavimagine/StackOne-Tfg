@@ -7,7 +7,7 @@
     "scripts": {
         "dev": "set NODE_ENV=development && node app.js",
         "start": "set NODE_ENV=production && node app.js",
-        "test": "jest"
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
     },
     "keywords": [
         "supabase",
@@ -18,14 +18,13 @@
     "license": "MIT",
     "dependencies": {
         "@supabase/supabase-js": "^2.98.0",
-        "bcrypt": "^6.0.0",
         "cors": "^2.8.6",
         "dotenv": "^17.3.1",
         "express": "^4.19.2",
         "express-session": "^1.19.0",
-        "serverless-http": "^3.2.0",
+        "mysql2": "^3.18.2",
         "pg": "^8.19.0",
-        "mysql2": "^3.18.2"
+        "serverless-http": "^3.2.0"
     },
     "devDependencies": {
         "jest": "^30.3.0",

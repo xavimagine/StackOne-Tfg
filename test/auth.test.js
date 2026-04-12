@@ -1,7 +1,7 @@
-const request = require("supertest");
-const express = require("express");
+import request from "supertest";
+import express from "express";
+import { jest } from "@jest/globals";
 
-// Mock manual para asegurar que todas las funciones existan en el router
 const mockAuthCtrl = {
     registro: jest.fn(),
     login: jest.fn(),
@@ -9,15 +9,14 @@ const mockAuthCtrl = {
     deleteAccount: jest.fn(),
 };
 
-jest.mock("../controllers/authController", () => mockAuthCtrl);
+jest.unstable_mockModule("../controllers/authController.js", () => ({
+    default: mockAuthCtrl,
+}));
 
-// Importamos el router. Si falla por el middleware, asegúrate que la ruta en
-// el archivo authRoutes.js sea correcta.
-const authRouter = require("../routes/authRoutes");
+const { default: authRouter } = await import("../routes/authRoutes.js");
 
 const app = express();
 app.use(express.json());
-// Simulamos una sesión básica para que no explote req.session
 app.use((req, res, next) => {
     req.session = { destroy: (cb) => cb(null), usuario: { id: 1 } };
     next();
@@ -29,7 +28,6 @@ describe("Auth Routes", () => {
         mockAuthCtrl.registro.mockImplementation((req, res) =>
             res.status(201).json({ ok: true }),
         );
-
         const res = await request(app)
             .post("/auth/registro")
             .send({ usuario: "test" });
@@ -40,7 +38,6 @@ describe("Auth Routes", () => {
         mockAuthCtrl.logout.mockImplementation((req, res) =>
             res.status(200).json({ ok: true }),
         );
-
         const res = await request(app).post("/auth/logout");
         expect(res.statusCode).toBe(200);
     });

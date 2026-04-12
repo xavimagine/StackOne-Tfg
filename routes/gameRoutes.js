@@ -9,5 +9,4 @@ router.get("/listar", gameController.listar);
 router.post("/lista", ListaController.toggle);
 router.get("/progreso", ListaController.obtenerProgreso);
 
-// CAMBIO: module.exports -> export default
 export default router;

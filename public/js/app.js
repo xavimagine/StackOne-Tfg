@@ -250,7 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
                 botonMenu.click();
             } else {
-                Swal.fire({
+                await Swal.fire({
                     title: '<span style="color:#2ecc71">¡Excelente!</span>',
                     text: "Te has registrado con éxito",
                     background: "#fff",
@@ -282,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 userName.textContent = resultado.nick;
                 bienvenida.textContent = `¡ Bienvenido ${resultado.nick} !`;
                 currentUserId = resultado.id;
-                fetchGames(currentPage);
+                fetchGames(1);
                 actualizarProgresoVisual();
             }
         } catch (error) {
@@ -314,7 +314,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         .getElementById("logged-out-view")
                         .classList.remove("hidden");
                     limpiarSesion();
-                    fetchGames(currentPage);
+                    fetchGames(1);
                 }
             } catch (error) {
                 limpiarSesion();
@@ -714,7 +714,10 @@ document.addEventListener("DOMContentLoaded", () => {
                             cargarListaActual();
                         }
                     } catch (err) {
-                        console.error("Error al actualizar la lista:", err);
+                        await registrarLog(
+                            "ERROR",
+                            `Error al actualizar lista: ${err.message}`,
+                        );
                     }
                 });
             });
@@ -896,8 +899,7 @@ async function actualizarProgresoVisual() {
             credentials: "include",
         });
 
-        if (res.status === 401)
-            return console.warn("Inicia sesión para ver progreso");
+        if (res.status === 401) return;
 
         const data = await res.json();
 
@@ -913,7 +915,10 @@ async function actualizarProgresoVisual() {
                 xpDetalle.innerText = `${data.xpBarra} / ${data.xpMax} XP`;
         }
     } catch (err) {
-        console.error("Error al actualizar la barra:", err);
+        await registrarLog(
+            "ERROR",
+            `Error al actualizar la barra: ${err.message}`,
+        );
     }
 }
 
@@ -956,7 +961,7 @@ async function eliminarCuenta() {
         sessionStorage.clear();
         window.location.href = "index.html";
     } catch (error) {
-        console.error("Error en fetch:", error);
+        await registrarLog("ERROR", `Error en fetch:: ${err.message}`);
         await Swal.fire("Error", "Error de conexión", "error");
     }
 }
