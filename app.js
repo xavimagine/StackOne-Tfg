@@ -13,15 +13,16 @@ app.use((req, res, next) => {
         "http://localhost:3000",
         "http://localhost:5173",
         "http://127.0.0.1:3000",
-        process.env.FRONTEND_URL || "https://tu-sitio.vercel.app",
-    ];
+        "https://stackone-play.netlify.app",
+        "https://stackone.vercel.app",
+        process.env.FRONTEND_URL,
+    ].filter(Boolean);
+
     const origin = req.headers.origin;
     if (allowedOrigins.includes(origin)) {
         res.header("Access-Control-Allow-Origin", origin);
-    } else {
-        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Credentials", "true");
     }
-    res.header("Access-Control-Allow-Credentials", "true");
     res.header(
         "Access-Control-Allow-Methods",
         "GET, POST, PUT, DELETE, OPTIONS",
@@ -62,9 +63,11 @@ app.post("/events", async (req, res) => {
                     detalle: authData,
                 });
         }
+
         const accessToken = authData.access_token;
         const clientId = process.env.TWITCH_CLIENT_ID;
         const inicioAnio = Math.floor(new Date("2026-01-01").getTime() / 1000);
+
         const response = await fetch("https://api.igdb.com/v4/events", {
             method: "POST",
             headers: {
@@ -78,6 +81,7 @@ app.post("/events", async (req, res) => {
                    sort start_time asc; 
                    limit 40;`,
         });
+
         const events = await response.json();
         if (!Array.isArray(events)) {
             return res
