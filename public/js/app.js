@@ -3,7 +3,12 @@ const API_URL =
         ? "http://localhost:3000"
         : "https://stackone-tfg.onrender.com";
 //para el deploy
-
+const savedTheme = localStorage.getItem("theme");
+if (savedTheme === "dark") {
+    document.documentElement.classList.add("dark");
+} else {
+    document.documentElement.classList.remove("dark");
+}
 document.addEventListener("DOMContentLoaded", () => {
     const ITEMS_PER_PAGE = 20;
     let currentPage = 1;
@@ -14,7 +19,14 @@ document.addEventListener("DOMContentLoaded", () => {
         plataforma: "",
         rating: null,
     };
-
+    const themeToggle = document.getElementById("theme-toggle");
+    if (themeToggle) {
+        themeToggle.addEventListener("click", () => {
+            document.documentElement.classList.toggle("dark");
+            const isDark = document.documentElement.classList.contains("dark");
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+        });
+    }
     const menuBtn = document.getElementById("menu-btn");
     const desplegarMenu = document.getElementById("dropdown-menu");
     const botonMenu = document.getElementById("toggle-view");

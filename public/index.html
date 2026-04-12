@@ -51,6 +51,7 @@
             content="https://stackone.vercel.app/assets/share/compartir.png" />
 
         <!-- Estilos -->
+
         <link rel="stylesheet" href="css/style.css" />
 
         <!-- Fonts -->
@@ -128,15 +129,16 @@
 
                 <div class="flex items-center gap-4 shrink-0">
                     <button
-                        class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                        onclick="
-                            document.documentElement.classList.toggle('dark')
-                        ">
-                        <span class="material-icons dark:hidden text-gray-600"
+                        id="theme-toggle"
+                        class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                        <span
+                            id="icon-moon"
+                            class="material-icons text-gray-600"
                             >dark_mode</span
                         >
                         <span
-                            class="material-icons hidden dark:block text-yellow-400"
+                            id="icon-sun"
+                            class="material-icons text-yellow-400"
                             >light_mode</span
                         >
                     </button>

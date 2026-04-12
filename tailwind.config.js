@@ -20,5 +20,14 @@ export default {
             },
         },
     },
-    plugins: [],
+    plugins: [
+        function ({ addComponents }) {
+            addComponents({
+                "html.dark #icon-sun": { display: "block" },
+                "html.dark #icon-moon": { display: "none" },
+                "html:not(.dark) #icon-sun": { display: "none" },
+                "html:not(.dark) #icon-moon": { display: "block" },
+            });
+        },
+    ],
 };
