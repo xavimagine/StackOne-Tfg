@@ -1,7 +1,7 @@
 const API_URL =
     window.location.hostname === "localhost"
         ? "http://localhost:3000"
-        : "https://stackone-play.netlify.app";
+        : "https://stackone.vercel.app/";
 
 document.addEventListener("DOMContentLoaded", () => {
     const ITEMS_PER_PAGE = 20;
