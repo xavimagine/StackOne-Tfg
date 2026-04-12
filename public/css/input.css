@@ -1,3 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@layer base {
+    #dropdown-menu input,
+    #dropdown-menu select,
+    #dropdown-menu textarea {
+        color: #111827;
+    }
+
+    html.dark #dropdown-menu input,
+    html.dark #dropdown-menu select,
+    html.dark #dropdown-menu textarea {
+        color: #111827;
+        border-color: #4b5563;
+    }
+}

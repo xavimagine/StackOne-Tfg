@@ -120,7 +120,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     window.addEventListener("click", (e) => {
-        if (!document.getElementById("dropdown-container").contains(e.target)) {
+        if (
+            !document.getElementById("dropdown-container").contains(e.target) &&
+            !document.getElementById("theme-toggle").contains(e.target)
+        ) {
             desplegarMenu.classList.add("hidden");
         }
     });
