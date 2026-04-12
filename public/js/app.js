@@ -1,7 +1,7 @@
 const API_URL =
     window.location.hostname === "localhost"
         ? "http://localhost:3000"
-        : "https://stackone.vercel.app/";
+        : "https://stackone-tfg.onrender.com";
 //para el deploy
 
 document.addEventListener("DOMContentLoaded", () => {
