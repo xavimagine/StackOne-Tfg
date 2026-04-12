@@ -1,19 +1,11 @@
 import express from "express";
+import listController from "../controllers/listaController.js";
+import { verificarJWT } from "./middleware.js";
+
 const router = express.Router();
 
-import listController from "../controllers/listaController.js";
-
-// Middleware de protección
-function soloLogueados(req, res, next) {
-    if (req.session.usuario) {
-        next();
-    } else {
-        res.status(401).json({ error: "No autorizado" });
-    }
-}
-
 router.get("/games/lista/:status", listController.obtenerPorEstado);
-router.post("/buscar", soloLogueados, listController.buscar);
-router.post("/add", soloLogueados, listController.crear);
+router.get("/games/buscar", listController.buscar);
+router.post("/games/add", verificarJWT, listController.crear);
 
 export default router;

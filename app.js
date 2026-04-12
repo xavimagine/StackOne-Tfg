@@ -1,7 +1,5 @@
 import express from "express";
-import cors from "cors";
-import session from "express-session";
-
+import cookieParser from "cookie-parser";
 import gameRoutes from "./routes/gameRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import logsRoutes from "./routes/logsRoutes.js";
@@ -9,22 +7,20 @@ import listasRoutes from "./routes/listRaoutes.js";
 
 const app = express();
 
-// CORS MIDDLEWARE
+// CORS
 app.use((req, res, next) => {
     const allowedOrigins = [
         "http://localhost:3000",
         "http://localhost:5173",
         "http://127.0.0.1:3000",
-        process.env.FRONTEND_URL || "https://tu-sitio.netlify.app",
+        process.env.FRONTEND_URL || "https://tu-sitio.vercel.app",
     ];
-
     const origin = req.headers.origin;
     if (allowedOrigins.includes(origin)) {
         res.header("Access-Control-Allow-Origin", origin);
     } else {
         res.header("Access-Control-Allow-Origin", "*");
     }
-
     res.header("Access-Control-Allow-Credentials", "true");
     res.header(
         "Access-Control-Allow-Methods",
@@ -34,36 +30,17 @@ app.use((req, res, next) => {
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept, Authorization",
     );
-
-    if (req.method === "OPTIONS") {
-        return res.sendStatus(200);
-    }
+    if (req.method === "OPTIONS") return res.sendStatus(200);
     next();
 });
 
 // MIDDLEWARES
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-app.use(
-    session({
-        secret:
-            process.env.SESSION_SECRET ||
-            "secreto_de_respaldo_por_si_falla_el_env",
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            maxAge: 3600000,
-            secure: process.env.NODE_ENV === "production",
-            httpOnly: true,
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        },
-    }),
-);
-
+app.use(cookieParser());
 app.use(express.static("public"));
 
-//  RUTAS
+// RUTAS
 app.use("/games", gameRoutes);
 app.use("/auth", authRoutes);
 app.use("/logs", logsRoutes);
@@ -76,20 +53,18 @@ app.post("/events", async (req, res) => {
             `https://id.twitch.tv/oauth2/token?client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&grant_type=client_credentials`,
             { method: "POST" },
         );
-
         const authData = await authResponse.json();
         if (!authData.access_token) {
-            return res.status(401).json({
-                error: "No se obtuvo access_token",
-                detalle: authData,
-            });
+            return res
+                .status(401)
+                .json({
+                    error: "No se obtuvo access_token",
+                    detalle: authData,
+                });
         }
-
         const accessToken = authData.access_token;
         const clientId = process.env.TWITCH_CLIENT_ID;
-
         const inicioAnio = Math.floor(new Date("2026-01-01").getTime() / 1000);
-
         const response = await fetch("https://api.igdb.com/v4/events", {
             method: "POST",
             headers: {
@@ -103,16 +78,15 @@ app.post("/events", async (req, res) => {
                    sort start_time asc; 
                    limit 40;`,
         });
-
         const events = await response.json();
-
         if (!Array.isArray(events)) {
-            return res.status(500).json({
-                error: "Respuesta inesperada de IGDB",
-                detalle: events,
-            });
+            return res
+                .status(500)
+                .json({
+                    error: "Respuesta inesperada de IGDB",
+                    detalle: events,
+                });
         }
-
         res.json(events);
     } catch (error) {
         res.status(500).json({ error: error.message });

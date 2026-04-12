@@ -1,23 +1,12 @@
 import express from "express";
+import authController from "../controllers/authController.js";
+import { verificarJWT } from "./middleware.js";
+
 const router = express.Router();
 
-import authController from "../controllers/authController.js";
-
-const isAuthenticated = (req, res, next) => {
-    if (req.session.usuario) return next();
-    res.status(401).json({ ok: false, mensaje: "No autorizado" });
-};
-
-// Registro
 router.post("/registro", authController.registro);
-
-// Login
 router.post("/login", authController.login);
-
-// Logout
-router.post("/logout", isAuthenticated, authController.logout);
-
-// Eliminar cuenta
-router.delete("/delete", isAuthenticated, authController.deleteAccount);
+router.post("/logout", verificarJWT, authController.logout);
+router.delete("/delete", verificarJWT, authController.deleteAccount);
 
 export default router;
