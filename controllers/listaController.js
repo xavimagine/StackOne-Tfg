@@ -1,5 +1,5 @@
 import { supabase } from "../db/database.js";
-import ListasDAO from "../dao/listasDAO.js";
+import ListasDAO from "../dao/ListasDAO.js";
 
 class ListaController {
     static async toggle(req, res) {
