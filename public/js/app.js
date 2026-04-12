@@ -2,6 +2,7 @@ const API_URL =
     window.location.hostname === "localhost"
         ? "http://localhost:3000"
         : "https://stackone.vercel.app/";
+//para el deploy
 
 document.addEventListener("DOMContentLoaded", () => {
     const ITEMS_PER_PAGE = 20;
