@@ -249,8 +249,17 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             formUsuario.reset();
-            seccionPerfil.classList.add("hidden");
-            seccionBuscador.classList.remove("hidden");
+            const detalleVisible = !document
+                .getElementById("game-detail")
+                .classList.contains("hidden");
+
+            if (!detalleVisible) {
+                seccionPerfil.classList.add("hidden");
+                seccionBuscador.classList.remove("hidden");
+            } else {
+                seccionBuscador.classList.add("hidden");
+                seccionPerfil.classList.add("hidden");
+            }
 
             if (isRegister) {
                 Swal.fire({
@@ -400,7 +409,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderCards(games) {
         const container = document.getElementById("resultados");
         container.className =
-            "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4";
+            "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4";
         container.innerHTML = "";
 
         games.forEach((game) => {
@@ -651,7 +660,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         card.className =
-            "game-card relative group rounded-xl overflow-hidden shadow-lg h-64 cursor-pointer bg-gray-900";
+            "game-card relative group rounded-xl overflow-hidden shadow-lg h-auto cursor-pointer bg-gray-900";
 
         card.innerHTML = `
     <img alt="${coverAlt || name}" class="game-cover w-full h-full object-cover" src="${finalCover}" />
@@ -659,7 +668,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <div class="absolute top-3 right-3 bg-black/60 backdrop-blur text-white text-xs font-bold px-2 py-1 rounded border border-white/20">
         ${genres}
     </div>
-    <div class="game-info absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-primary/90 to-primary/80 backdrop-blur-md border-t border-white/10 text-white">
+    <div id = "game-info"class="game-info absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-primary/90 to-primary/80 backdrop-blur-md border-t border-white/10 text-white">
         <h3 class="text-xl font-bold mb-1">${name}</h3>
         <div class="flex items-center gap-3 text-sm text-white/80 mb-3">
             <span class="flex items-center gap-1">
