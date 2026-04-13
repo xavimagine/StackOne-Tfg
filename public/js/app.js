@@ -347,10 +347,12 @@ document.addEventListener("DOMContentLoaded", () => {
         sectionEventos.classList.add("hidden");
         seccionBuscador.classList.remove("hidden");
         seccionPerfil.classList.add("hidden");
+        document.getElementById("game-detail").classList.add("hidden");
         limpiarListasActivas();
     });
     lemastack.addEventListener("click", (e) => {
         e.preventDefault();
+        document.getElementById("game-detail").classList.add("hidden");
         sectionEventos.classList.add("hidden");
         seccionBuscador.classList.remove("hidden");
         seccionPerfil.classList.add("hidden");
