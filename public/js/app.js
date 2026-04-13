@@ -598,7 +598,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return texto.trim().replace(/[<>]/g, "").slice(0, 220);
     }
     function applyFilters() {
-        const DEFAULTS = ["Genero", "Platform", "Rating", ""];
+        const DEFAULTS = ["Genero", "Platforma", "Rating", ""];
         activeFilters = {
             texto: limpiarTextoBusqueda(searchInput.value),
             genero: DEFAULTS.includes(filterGenre.value)
