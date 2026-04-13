@@ -82,6 +82,8 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("user-avatar").src = "";
         document.getElementById("avatarProfile").src = "";
         currentUserId = null;
+        linkPerfil.classList.add("hidden");
+        linkPerfilMobile.classList.add("hidden");
     }
 
     if (mobileMenuBtn && mobileMenu) {
@@ -293,7 +295,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 document
                     .getElementById("logged-in-view")
                     .classList.remove("hidden");
-
+                if (linkPerfil) linkPerfil.classList.remove("hidden");
+                if (linkPerfilMobile)
+                    linkPerfilMobile.classList.remove("hidden");
                 const nameSpan = document.getElementById("user-display-name");
                 const avatarImg = document.getElementById("user-avatar");
                 const avatarProfile = document.getElementById("avatarProfile");
