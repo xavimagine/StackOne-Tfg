@@ -19,3 +19,13 @@ export const verificarJWT = (req, res, next) => {
             .json({ ok: false, mensaje: "Token inválido o expirado" });
     }
 };
+export const verificarJWTOpcional = (req, res, next) => {
+    try {
+        const token = req.cookies?.token;
+        if (token) {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            req.usuario = decoded;
+        }
+    } catch (error) {}
+    next();
+};

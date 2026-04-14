@@ -426,7 +426,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 coverAlt: game.name,
                 game_mode: game.game_modes,
                 game_id: game.id,
-                userStatus: game.user_status,
+                userStatus: game.status,
                 summary: game.summary,
                 platforms: game.platforms,
             });

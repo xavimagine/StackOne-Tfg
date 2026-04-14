@@ -25,7 +25,6 @@ class GameController {
     static async buscarConPaginacion(req, res) {
         try {
             const userId = req.usuario?.id || 0;
-
             const texto = req.query.texto || "";
             const orden = req.query.orden || "name";
             const direccion = req.query.direccion || "asc";

@@ -1,18 +1,5 @@
 import { supabase } from "../db/database.js";
 class GameDAO {
-    static async listar(page = 1, limit = 10) {
-        const offset = (page - 1) * limit;
-        const { data, count, error } = await supabase
-            .from("games")
-            .select(
-                "id, id_game, name, summary,cover, genres, rating, game_modes, company",
-                { count: "planned" },
-            )
-            .order("name", { ascending: true })
-            .range(offset, offset + limit - 1);
-        if (error) throw new Error(error.message);
-        return { games: data, total: count };
-    }
     static async buscarConPaginacion(
         userId = 0,
         texto = "",
@@ -57,9 +44,28 @@ class GameDAO {
 
             query = query.range(offset, offset + limit - 1);
 
-            const { data, count, error } = await query;
+            const [{ data, count, error }, { data: marcados }] =
+                await Promise.all([
+                    query,
+                    userId
+                        ? supabase
+                              .from("listas_games")
+                              .select("game_id, status")
+                              .eq("user_id", userId)
+                        : Promise.resolve({ data: [] }),
+                ]);
+
             if (error) throw error;
-            return { games: data, total: count };
+
+            const marcadosMap = {};
+            marcados?.forEach((m) => (marcadosMap[m.game_id] = m.status));
+
+            const games = data.map((game) => ({
+                ...game,
+                status: marcadosMap[game.id] || null,
+            }));
+
+            return { games, total: count };
         } catch (err) {
             return { games: [], total: 0 };
         }

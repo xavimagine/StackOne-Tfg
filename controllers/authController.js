@@ -12,20 +12,16 @@ const registro = async (req, res) => {
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            return res
-                .status(400)
-                .json({
-                    ok: false,
-                    mensaje: "El formato del correo no es válido",
-                });
+            return res.status(400).json({
+                ok: false,
+                mensaje: "El formato del correo no es válido",
+            });
         }
         if (!usuario || usuario.trim().length < 3) {
-            return res
-                .status(400)
-                .json({
-                    ok: false,
-                    mensaje: "El nick debe tener al menos 3 caracteres",
-                });
+            return res.status(400).json({
+                ok: false,
+                mensaje: "El nick debe tener al menos 3 caracteres",
+            });
         }
 
         const emailLimpio = email.replace(/[<>]/g, "");
