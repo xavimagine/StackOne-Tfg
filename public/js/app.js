@@ -400,7 +400,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     linkPerfilMobile.addEventListener("click", () => {
-        document.getElementById("game-detail").classList.add("hidden"); // añade esto
+        document.getElementById("game-detail").classList.add("hidden");
         if (isUserLoggedIn()) {
             seccionBuscador.classList.add("hidden");
             seccionPerfil.classList.remove("hidden");
@@ -506,6 +506,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function renderPagination({ currentPage, totalPages }) {
         let pagination = document.getElementById("pagination");
+        const isMobile = window.innerWidth <= 768;
         if (!pagination) {
             pagination = document.createElement("div");
             pagination.id = "pagination";
@@ -518,9 +519,10 @@ document.addEventListener("DOMContentLoaded", () => {
         pagination.innerHTML = "";
 
         const prevBtn = document.createElement("button");
+        prevBtn.setAttribute("data-prev", "");
         prevBtn.textContent = "← Anterior";
         prevBtn.disabled = currentPage === 1;
-        prevBtn.className = `px-4 py-2 rounded-lg text-sm font-medium transition ${
+        prevBtn.className = `${isMobile ? "px-2 py-1" : "px-4 py-2"} rounded-lg text-sm font-medium transition ${
             currentPage === 1
                 ? "bg-gray-700 text-gray-500 cursor-not-allowed"
                 : "bg-gray-800 text-white hover:bg-primary cursor-pointer"
@@ -559,13 +561,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const nextBtn = document.createElement("button");
+        nextBtn.setAttribute("data-next", "");
         nextBtn.textContent = "Siguiente →";
         nextBtn.disabled = currentPage >= totalPages;
-        nextBtn.className = `px-4 py-2 rounded-lg text-sm font-medium transition ${
+        nextBtn.className = `${isMobile ? "px-2 py-1" : "px-4 py-2"} rounded-lg text-sm font-medium transition ${
             currentPage >= totalPages
                 ? "bg-gray-700 text-gray-500 cursor-not-allowed"
                 : "bg-gray-800 text-white hover:bg-primary cursor-pointer"
         }`;
+
         nextBtn.onclick = () => fetchGames(currentPage + 1, activeFilters);
         pagination.appendChild(nextBtn);
     }

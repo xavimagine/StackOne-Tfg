@@ -2,8 +2,6 @@ import { supabase } from "../db/database.js";
 class ListasDAO {
     static async obtenerConteoPorEstado(userId) {
         try {
-            // IMPORTANTE: Asegúrate de que la tabla sea "listas_games"
-            // como en tus controladores anteriores, o "listas_juegos".
             const { data, error } = await supabase
                 .from("listas_games")
                 .select("status")
@@ -55,9 +53,8 @@ class ListasDAO {
 
             if (error) throw error;
 
-            // Limpiamos la respuesta y manejamos posibles nulos
             const juegosFormateados = data
-                .filter((item) => item.games !== null) // Evita errores si un juego fue borrado de la tabla principal
+                .filter((item) => item.games !== null)
                 .map((item) => ({
                     id_relacion: item.id_relacion,
                     status: item.status,
@@ -75,11 +72,6 @@ class ListasDAO {
     static async obtenerProgreso(req, res) {
         const userId = req.session.usuario?.id;
         const resultado = await ListasDAO.obtenerConteoPorEstado(userId);
-
-        if (resultado.ok) {
-            // Aquí calculas el nivel con resultado.data.acabado
-            // ...
-        }
     }
     static async obtenerJuegosPorEstado(userId, status) {
         const { data, error } = await supabase

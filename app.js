@@ -56,12 +56,10 @@ app.post("/events", async (req, res) => {
         );
         const authData = await authResponse.json();
         if (!authData.access_token) {
-            return res
-                .status(401)
-                .json({
-                    error: "No se obtuvo access_token",
-                    detalle: authData,
-                });
+            return res.status(401).json({
+                error: "No se obtuvo access_token",
+                detalle: authData,
+            });
         }
 
         const accessToken = authData.access_token;
@@ -84,12 +82,10 @@ app.post("/events", async (req, res) => {
 
         const events = await response.json();
         if (!Array.isArray(events)) {
-            return res
-                .status(500)
-                .json({
-                    error: "Respuesta inesperada de IGDB",
-                    detalle: events,
-                });
+            return res.status(500).json({
+                error: "Respuesta inesperada de IGDB",
+                detalle: events,
+            });
         }
         res.json(events);
     } catch (error) {
