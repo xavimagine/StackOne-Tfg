@@ -544,7 +544,7 @@ document.addEventListener("DOMContentLoaded", () => {
         for (let i = startPage; i <= endPage; i++) {
             const pageBtn = document.createElement("button");
             pageBtn.textContent = i;
-            pageBtn.className = `px-3 py-2 rounded-lg text-sm font-medium transition cursor-pointer ${
+            pageBtn.className = `${isMobile ? "px-2 py-1" : "px-3 py-2"} rounded-lg text-sm font-medium transition cursor-pointer ${
                 i === currentPage
                     ? "bg-primary text-white"
                     : "bg-gray-800 text-white hover:bg-primary"
