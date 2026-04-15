@@ -2,19 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 @layer base {
+    /* MODO CLARO (Por defecto) */
     #dropdown-menu input,
     #dropdown-menu select,
     #dropdown-menu textarea {
         color: #111827;
-        background-color: #a55eec24;
-        border-color: #4b5563;
+        background-color: #ffffff;
+        border-color: #d1d5db;
     }
 
+    /* MODO OSCURO (Cuando la clase .dark está en el html) */
     html.dark #dropdown-menu input,
     html.dark #dropdown-menu select,
     html.dark #dropdown-menu textarea {
-        color: #111827;
-        background-color: #a55eec24;
-        border-color: #4b5563;
+        color: #ffffff;
+        background-color: #1f2937;
+        border-color: #374151;
     }
 }

@@ -9,7 +9,7 @@
 
 @media (max-width: 768px) {
     .game-card {
-        width: var(--card-width, 280px);
+        width: 100%;
     }
 }
 @media (max-width: 768px) {
@@ -47,4 +47,42 @@ html {
         background-color 0.4s ease,
         color 0.4s ease,
         border-color 0.4s ease;
+}
+/* --- Cambio para inputs en Modo Oscuro --- */
+
+html.dark #dropdown-menu input,
+html.dark #dropdown-menu select,
+html.dark #dropdown-menu textarea {
+    color: #ffffff !important;
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+}
+
+html.dark #dropdown-menu input::placeholder {
+    color: #9ca3af;
+}
+
+html.dark #dropdown-menu input:-webkit-autofill {
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+#dropdown-menu input:-webkit-autofill,
+#dropdown-menu input:-webkit-autofill:hover,
+#dropdown-menu input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #111827;
+    box-shadow: 0 0 0px 1000px #a55eec24 inset;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+html.dark #dropdown-menu input:-webkit-autofill {
+    -webkit-text-fill-color: #ffffff !important;
+    box-shadow: 0 0 0px 1000px #1f2937 inset !important;
+}
+#dropdown-menu input:-webkit-autofill,
+#dropdown-menu input:-webkit-autofill:hover,
+#dropdown-menu input:-webkit-autofill:focus,
+#dropdown-menu input:-webkit-autofill:active {
+    transition:
+        background-color 9999999s ease-in-out 0s,
+        color 9999999s ease-in-out 0s;
 }
