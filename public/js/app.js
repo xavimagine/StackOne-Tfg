@@ -673,7 +673,7 @@ document.addEventListener("DOMContentLoaded", () => {
         card.innerHTML = `
     <img alt="${coverAlt || name}" class="game-cover w-full h-full object-cover" src="${finalCover}" />
     <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60"></div>
-    <div class="absolute top-3 right-3 bg-black/60 backdrop-blur text-white text-xs font-bold px-2 py-1 rounded border border-white/20">
+    <div class="absolute top-3 right-3 max-w-[45%] bg-black/60 backdrop-blur text-white text-xs font-bold px-2 py-1 rounded border border-white/20 leading-tight break-words text-right">
         ${genres}
     </div>
     <div id = "game-info"class="game-info absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-primary/90 to-primary/80 backdrop-blur-md border-t border-white/10 text-white">
@@ -985,7 +985,6 @@ async function eliminarCuenta() {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error(`Error ${response.status}: ${errorText}`);
             await Swal.fire("Error", "No se pudo eliminar la cuenta", "error");
             return;
         }
