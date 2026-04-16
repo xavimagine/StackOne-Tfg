@@ -19,6 +19,58 @@ document.addEventListener("DOMContentLoaded", () => {
         plataforma: "",
         rating: null,
     };
+    //botones de mostra contraseña
+    const btnPass = document.getElementById("passvisibility");
+    const inputPass = document.querySelector('[name="password"]');
+    const iconPass = btnPass.querySelector(".material-icons");
+
+    btnPass.addEventListener("mousedown", () => {
+        inputPass.type = "text";
+        iconPass.textContent = "visibility_off";
+    });
+    btnPass.addEventListener("mouseup", () => {
+        inputPass.type = "password";
+        iconPass.textContent = "visibility";
+    });
+    btnPass.addEventListener("mouseleave", () => {
+        inputPass.type = "password";
+        iconPass.textContent = "visibility";
+    });
+    btnPass.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        inputPass.type = "text";
+        iconPass.textContent = "visibility_off";
+    });
+    btnPass.addEventListener("touchend", () => {
+        inputPass.type = "password";
+        iconPass.textContent = "visibility";
+    });
+
+    const btnVerif = document.getElementById("passVerifVisibility");
+    const inputVerif = document.getElementById("passVerif");
+    const iconVerif = btnVerif.querySelector(".material-icons");
+
+    btnVerif.addEventListener("mousedown", () => {
+        inputVerif.type = "text";
+        iconVerif.textContent = "visibility_off";
+    });
+    btnVerif.addEventListener("mouseup", () => {
+        inputVerif.type = "password";
+        iconVerif.textContent = "visibility";
+    });
+    btnVerif.addEventListener("mouseleave", () => {
+        inputVerif.type = "password";
+        iconVerif.textContent = "visibility";
+    });
+    btnVerif.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        inputVerif.type = "text";
+        iconVerif.textContent = "visibility_off";
+    });
+    btnVerif.addEventListener("touchend", () => {
+        inputVerif.type = "password";
+        iconVerif.textContent = "visibility";
+    });
     const themeToggle = document.getElementById("theme-toggle");
     if (themeToggle) {
         themeToggle.addEventListener("click", () => {

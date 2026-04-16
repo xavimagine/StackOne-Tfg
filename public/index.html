@@ -174,17 +174,6 @@
                                 class="mr-4 md:mr-0 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-3 py-2 rounded-lg font-medium flex items-center gap-2 hover:opacity-90 transition shadow-lg"
                                 id="menu-btn">
                                 <span>Login</span>
-                                <svg
-                                    class="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M19 9l-7 7-7-7"></path>
-                                </svg>
                             </button>
                         </div>
                         <div
@@ -212,7 +201,7 @@
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm p-2 border dark:text-white"
                                             placeholder="email@correo.com" />
                                     </div>
-                                    <div>
+                                    <div class="relative">
                                         <label
                                             class="block text-sm font-medium text-gray-700 dark:text-gray-300"
                                             >Usuario</label
@@ -225,28 +214,55 @@
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm p-2 border dark:text-black-100 dark:text-white"
                                             placeholder="Tu usuario" />
                                     </div>
-                                    <div>
+                                    <div class="relative">
                                         <label
                                             class="block text-sm font-medium text-gray-700 dark:text-gray-300"
                                             >Contraseña</label
                                         >
-                                        <input
-                                            type="password"
-                                            name="password"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm p-2 border dark:text-white"
-                                            placeholder="••••••••" />
+                                        <div class="relative mt-1">
+                                            <input
+                                                id="logpassword"
+                                                type="password"
+                                                name="password"
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm p-2 border dark:text-white"
+                                                placeholder="••••••••" />
+                                            <button
+                                                type="button"
+                                                id="passvisibility"
+                                                class="password-toggle absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                                                data-target="passVerif">
+                                                <span
+                                                    class="material-icons text-lg"
+                                                    >visibility</span
+                                                >
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div id="verify-field" class="hidden">
+                                    <div
+                                        id="verify-field"
+                                        class="hidden relative">
                                         <label
                                             class="block text-sm font-medium text-gray-700 dark:text-gray-300"
                                             >Confirmar Contraseña</label
                                         >
-                                        <input
-                                            type="password"
-                                            id="passVerif"
-                                            name="confirmPassword"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm p-2 border dark:text-white"
-                                            placeholder="••••••••" />
+                                        <div class="relative mt-1">
+                                            <input
+                                                type="password"
+                                                id="passVerif"
+                                                name="confirmPassword"
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm p-2 border dark:text-white"
+                                                placeholder="••••••••" />
+                                            <button
+                                                type="button"
+                                                id="passVerifVisibility"
+                                                class="password-toggle absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                                                data-target="passVerif">
+                                                <span
+                                                    class="material-icons text-lg"
+                                                    >visibility</span
+                                                >
+                                            </button>
+                                        </div>
                                     </div>
                                     <button
                                         type="submit"
