@@ -834,6 +834,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     navEventoMobile.addEventListener("click", () => {
+        document.getElementById("game-detail").classList.add("hidden");
         sectionDescubrir.classList.add("hidden");
         seccionPerfil.classList.add("hidden");
         sectionEventos.classList.remove("hidden");
@@ -841,6 +842,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     btnEventos.addEventListener("click", () => {
+        document.getElementById("game-detail").classList.add("hidden");
         sectionDescubrir.classList.add("hidden");
         seccionPerfil.classList.add("hidden");
         sectionEventos.classList.remove("hidden");
