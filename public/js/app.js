@@ -441,7 +441,7 @@ document.addEventListener("DOMContentLoaded", () => {
     linkPerfil.addEventListener("click", (e) => {
         e.preventDefault();
         sectionEventos.classList.add("hidden");
-        sectionEventos.classList.add("hidden");
+        document.getElementById("game-detail").classList.add("hidden");
         if (isUserLoggedIn()) {
             seccionBuscador.classList.add("hidden");
             seccionPerfil.classList.remove("hidden");
