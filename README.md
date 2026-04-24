@@ -1,4 +1,4 @@
-# 🚀 StackOne - TFG Web App
+#  StackOne - TFG Web App
 
 Aplicación web desarrollada como Trabajo de Fin de Grado (TFG), orientada a la gestión y visualización de datos integrados mediante APIs externas.
 
@@ -114,7 +114,7 @@ npm start
 
 ## 👨‍💻 Autor
 
-- Xavi
+- Javier Díaz Rayo
 
 ## 📜 Licencia
 
