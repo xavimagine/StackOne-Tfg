@@ -20,15 +20,14 @@ El objetivo principal es simplificar la integración de múltiples servicios en 
 
 ### Frontend
 - HTML / CSS / JavaScript
-- (React / Vue / Angular — ajustar según tu proyecto)
-- Tailwind / Bootstrap (si aplica)
+- Tailwind 
 
 ### Backend
 - Node.js + Express
 - API REST
 
 ### Base de datos
-- MySQL / MongoDB / PostgreSQL (ajustar)
+-  PostgreSQL 
 
 ### Otros
 - JWT para autenticación
