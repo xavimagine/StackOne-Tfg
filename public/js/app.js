@@ -9,7 +9,7 @@ if (savedTheme === "dark") {
 } else {
     document.documentElement.classList.remove("dark");
 }
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const ITEMS_PER_PAGE = 20;
     let currentPage = 1;
     let currentUserId = null;
@@ -977,7 +977,34 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
-
+    // Restaurar sesión al cargar
+    try {
+        const res = await fetch(`${API_URL}/auth/me`, {
+            credentials: "include",
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.ok) {
+                document
+                    .getElementById("logged-out-view")
+                    .classList.add("hidden");
+                document
+                    .getElementById("logged-in-view")
+                    .classList.remove("hidden");
+                document.getElementById("user-display-name").textContent =
+                    data.nick;
+                document.getElementById("user-avatar").src = data.avatar;
+                document.getElementById("avatarProfile").src = data.avatar;
+                document.getElementById("Nombreuser").textContent = data.nick;
+                document.getElementById("bienvenida").textContent =
+                    `¡ Bienvenido ${data.nick} !`;
+                linkPerfil.classList.remove("hidden");
+                linkPerfilMobile.classList.remove("hidden");
+                currentUserId = data.id;
+                actualizarProgresoVisual();
+            }
+        }
+    } catch (e) {}
     fetchGames(1);
 });
 

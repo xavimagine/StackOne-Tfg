@@ -8,5 +8,5 @@ router.post("/registro", authController.registro);
 router.post("/login", authController.login);
 router.post("/logout", verificarJWT, authController.logout);
 router.delete("/delete", verificarJWT, authController.deleteAccount);
-
+router.get("/me", verificarJWT, authController.me);
 export default router;

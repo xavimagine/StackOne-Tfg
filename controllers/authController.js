@@ -122,7 +122,29 @@ const login = async (req, res) => {
         });
     }
 };
+//session
+const me = async (req, res) => {
+    try {
+        const { data: userData, error } = await supabase
+            .from("users")
+            .select("id, nick, avatar")
+            .eq("id", req.usuario.id)
+            .single();
 
+        if (error || !userData) {
+            return res.status(401).json({ ok: false });
+        }
+
+        res.json({
+            ok: true,
+            nick: userData.nick,
+            avatar: userData.avatar,
+            id: userData.id,
+        });
+    } catch (error) {
+        res.status(500).json({ ok: false });
+    }
+};
 // --- Logout ---
 const logout = (req, res) => {
     const userId = req.usuario?.id;
@@ -184,5 +206,5 @@ const deleteAccount = async (req, res) => {
     }
 };
 
-const authController = { registro, login, logout, deleteAccount };
+const authController = { registro, login, logout, deleteAccount, me };
 export default authController;
