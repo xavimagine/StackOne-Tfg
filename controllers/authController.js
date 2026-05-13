@@ -169,40 +169,54 @@ const deleteAccount = async (req, res) => {
                 .json({ ok: false, mensaje: "No autorizado" });
         }
 
-        const { data: userData } = await supabase
+        const { data: userData, error: fetchError } = await supabase
             .from("users")
             .select("email")
             .eq("id", userId)
             .single();
+
+        if (fetchError || !userData) {
+            return res
+                .status(404)
+                .json({ ok: false, mensaje: "Usuario no encontrado" });
+        }
+
+        await LogDAO.insertar(
+            userId,
+            "INFO",
+            `Iniciando eliminación completa - ID: ${userId}`,
+        );
+
+        const { data: authListData, error: listError } =
+            await supabase.auth.admin.listUsers();
+
+        if (listError) throw listError;
+
+        const authUser = authListData.users.find(
+            (u) => u.email === userData.email,
+        );
+
+        if (authUser) {
+            const { error: authDeleteError } =
+                await supabase.auth.admin.deleteUser(authUser.id);
+            if (authDeleteError) throw authDeleteError;
+        }
 
         const { error: deleteError } = await supabase
             .from("users")
             .delete()
             .eq("id", userId);
 
-        if (deleteError) {
-            return res
-                .status(500)
-                .json({ ok: false, mensaje: deleteError.message });
-        }
+        if (deleteError) throw deleteError;
 
-        if (userData?.email) {
-            const { data: authUsers } = await supabase.auth.admin.listUsers();
-            const user = authUsers?.users?.find(
-                (u) => u.email === userData.email,
-            );
-            if (user) await supabase.auth.admin.deleteUser(user.id);
-        }
-
-        await LogDAO.insertar(
-            userId,
-            "INFO",
-            `Cuenta eliminada - ID: ${userId}`,
-        );
+        // 5. Limpieza de sesión
         res.clearCookie("token");
-        res.json({ ok: true, mensaje: "Cuenta eliminada correctamente" });
+        return res.json({
+            ok: true,
+            mensaje: "Cuenta y autenticación eliminadas correctamente",
+        });
     } catch (error) {
-        res.status(500).json({ ok: false, mensaje: error.message });
+        return res.status(500).json({ ok: false, mensaje: error.message });
     }
 };
 
