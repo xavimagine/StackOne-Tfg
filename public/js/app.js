@@ -669,19 +669,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         return texto.trim().replace(/[<>]/g, "").slice(0, 220);
     }
     function applyFilters() {
-        const DEFAULTS = ["Genero", "Platforma", "Rating", ""];
+        // Definimos qué valores significan "no filtrar"
+        const esDefault = (val) =>
+            !val ||
+            val === "Genero" ||
+            val === "Platform" ||
+            val === "Platforma" ||
+            val === "Rating" ||
+            val === "Selecciona Plataforma";
+
         activeFilters = {
             texto: limpiarTextoBusqueda(searchInput.value),
-            genero: DEFAULTS.includes(filterGenre.value)
-                ? ""
-                : filterGenre.value,
-            plataforma: DEFAULTS.includes(filterPlatform.value)
+            genero: esDefault(filterGenre.value) ? "" : filterGenre.value,
+            plataforma: esDefault(filterPlatform.value)
                 ? ""
                 : filterPlatform.value,
-            rating: DEFAULTS.includes(filterRating.value)
+            rating: esDefault(filterRating.value)
                 ? null
                 : parseFloat(filterRating.value),
         };
+
+        console.log("Filtros preparados:", activeFilters);
         fetchGames(1, activeFilters);
     }
 
@@ -825,11 +833,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     btnReset.addEventListener("click", (e) => {
         e.preventDefault();
+
         searchInput.value = "";
-        filterGenre.value = "Genero";
-        filterPlatform.value = "Platform";
-        filterRating.value = "Rating";
-        activeFilters = { texto: "", genero: "", plataforma: "", rating: null };
+
+        filterGenre.value = "";
+        filterPlatform.value = "";
+        filterRating.value = "";
+
+        activeFilters = {
+            texto: "",
+            genero: "",
+            plataforma: "",
+            rating: null,
+        };
+
         fetchGames(1, activeFilters);
     });
 

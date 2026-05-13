@@ -31,10 +31,16 @@ class GameDAO {
                 query = query.ilike("name", `%${texto.trim()}%`);
             }
             if (genero?.trim()) {
-                query = query.contains("genres", [genero.trim()]);
+                query = query.contains(
+                    "genres",
+                    JSON.stringify([genero.trim()]),
+                );
             }
             if (plataforma?.trim()) {
-                query = query.contains("platforms", [plataforma.trim()]);
+                query = query.contains(
+                    "platforms",
+                    JSON.stringify([plataforma.trim()]),
+                );
             }
             if (rating !== null && !isNaN(rating)) {
                 query = query.gte("rating", Number(rating));
