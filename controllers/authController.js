@@ -163,11 +163,10 @@ const logout = (req, res) => {
 const deleteAccount = async (req, res) => {
     try {
         const userId = req.usuario?.id;
-        if (!userId) {
+        if (!userId)
             return res
                 .status(401)
                 .json({ ok: false, mensaje: "No autorizado" });
-        }
 
         const { data: userData, error: fetchError } = await supabase
             .from("users")
@@ -181,15 +180,8 @@ const deleteAccount = async (req, res) => {
                 .json({ ok: false, mensaje: "Usuario no encontrado" });
         }
 
-        await LogDAO.insertar(
-            userId,
-            "INFO",
-            `Iniciando eliminación completa - ID: ${userId}`,
-        );
-
         const { data: authListData, error: listError } =
             await supabase.auth.admin.listUsers();
-
         if (listError) throw listError;
 
         const authUser = authListData.users.find(
@@ -199,8 +191,11 @@ const deleteAccount = async (req, res) => {
         if (authUser) {
             const { error: authDeleteError } =
                 await supabase.auth.admin.deleteUser(authUser.id);
-            if (authDeleteError) throw authDeleteError;
+            if (authDeleteError)
+                console.error("Error en Auth:", authDeleteError);
         }
+
+        await supabase.from("logs").delete().eq("user_id", userId);
 
         const { error: deleteError } = await supabase
             .from("users")
@@ -209,11 +204,10 @@ const deleteAccount = async (req, res) => {
 
         if (deleteError) throw deleteError;
 
-        // 5. Limpieza de sesión
         res.clearCookie("token");
         return res.json({
             ok: true,
-            mensaje: "Cuenta y autenticación eliminadas correctamente",
+            mensaje: "Cuenta eliminada correctamente",
         });
     } catch (error) {
         return res.status(500).json({ ok: false, mensaje: error.message });

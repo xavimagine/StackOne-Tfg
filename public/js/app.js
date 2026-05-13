@@ -1052,26 +1052,18 @@ async function actualizarProgresoVisual() {
         );
     }
 }
-
-document
-    .getElementById("delete-Acount")
-    .addEventListener("click", eliminarCuenta);
 async function eliminarCuenta() {
     const result = await Swal.fire({
         title: "¿Estás seguro?",
-        text: "Esta acción eliminará tu cuenta PERMANENTEMENTE y no podrás recuperarla.",
+        text: "Esta acción eliminará tu cuenta permanentemente.",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#ef4444",
-        cancelButtonColor: "#6b7280",
-        confirmButtonText: "Sí, eliminar mi cuenta",
+        confirmButtonText: "Sí, eliminar",
         cancelButtonText: "Cancelar",
-        reverseButtons: true,
     });
 
-    if (!result.isConfirmed) {
-        return;
-    }
+    if (!result.isConfirmed) return;
 
     try {
         const response = await fetch(`${API_URL}/auth/delete`, {
@@ -1079,19 +1071,20 @@ async function eliminarCuenta() {
             credentials: "include",
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-            const errorText = await response.text();
-            await Swal.fire("Error", "No se pudo eliminar la cuenta", "error");
-            return;
+            throw new Error(data.mensaje || "Error al eliminar");
         }
 
-        const data = await response.json();
         await Swal.fire("¡Eliminada!", data.mensaje, "success");
-
         sessionStorage.clear();
         window.location.href = "index.html";
     } catch (error) {
-        await registrarLog("ERROR", `Error en fetch:: ${err.message}`);
-        await Swal.fire("Error", "Error de conexión", "error");
+        Swal.fire("Error", error.message, "error");
     }
 }
+
+document
+    .getElementById("delete-Acount")
+    ?.addEventListener("click", eliminarCuenta);
