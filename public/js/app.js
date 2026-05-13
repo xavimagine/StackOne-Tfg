@@ -688,8 +688,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 ? null
                 : parseFloat(filterRating.value),
         };
-
-        console.log("Filtros preparados:", activeFilters);
         fetchGames(1, activeFilters);
     }
 
