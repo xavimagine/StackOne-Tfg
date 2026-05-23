@@ -148,7 +148,12 @@ const me = async (req, res) => {
 // --- Logout ---
 const logout = (req, res) => {
     const userId = req.usuario?.id;
-    res.clearCookie("token");
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    });
+
     if (userId) {
         LogDAO.insertar(
             userId,
