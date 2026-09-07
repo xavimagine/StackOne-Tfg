@@ -7,6 +7,8 @@ El proyecto se apoya íntegramente en **servicios serverless / BaaS**: la base d
 > Trabajo de Fin de Grado (TFG) — Desarrollo Web Full-Stack
 > Autor: **Javier Díaz Rayo** ([@xavimagine](https://github.com/xavimagine))
 
+https://github.com/user-attachments/assets/e3d4dc00-311e-418e-a6c4-c1dac25c102f
+
 ---
 
 ## 📌 Índice
